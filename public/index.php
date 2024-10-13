@@ -150,5 +150,18 @@ $app->get('/api/podcasts', function ($request, $response) {
     return $response->withJson($podcastUrls);
 });
 
+// Aggiungi questa nuova route dopo le altre route esistenti
+$app->delete('/api/podcasts/{filename}', function ($request, $response, $args) {
+    $filename = $args['filename'];
+    $podcastPath = __DIR__ . '/podcasts/' . $filename;
+
+    if (file_exists($podcastPath)) {
+        unlink($podcastPath);
+        return $response->withStatus(204);
+    } else {
+        return $response->withStatus(404)->withJson(['error' => 'Podcast non trovato']);
+    }
+});
+
 // Esecuzione dell'applicazione
 $app->run();

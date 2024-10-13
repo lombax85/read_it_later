@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchLinks();
     fetchPodcasts();
     handleResize();
+    changePodcast();
 });
 
 let selectedLinks = [];
@@ -102,7 +103,14 @@ function updatePodcastPlayer(newPodcastUrl) {
 function changePodcast() {
     const podcastSelect = document.getElementById('podcast-select');
     const audioPlayer = document.getElementById('audio-player');
+    const deleteButton = document.getElementById('delete-podcast-button');
+    
     audioPlayer.src = podcastSelect.value;
+    
+    // Abilita o disabilita il pulsante di eliminazione in base alla selezione
+    if (deleteButton) {
+        deleteButton.disabled = !podcastSelect.value;
+    }
 }
 
 function generateOrShowSummary(id, url) {
@@ -269,10 +277,17 @@ function fetchPodcasts() {
 function updatePodcastList(podcasts) {
     const podcastSelect = document.getElementById('podcast-select');
     const podcastSection = document.getElementById('podcast-section');
+    const audioPlayer = document.getElementById('audio-player');
+    
+    // Rimuovi il vecchio pulsante di eliminazione se esiste
+    const oldDeleteButton = document.getElementById('delete-podcast-button');
+    if (oldDeleteButton) {
+        oldDeleteButton.remove();
+    }
     
     if (podcasts.length > 0) {
         podcastSection.style.display = 'block';
-        podcastSelect.innerHTML = '';
+        podcastSelect.innerHTML = '<option value="">Seleziona un podcast</option>';
         podcasts.forEach((podcast, index) => {
             const option = document.createElement('option');
             option.value = podcast;
@@ -280,18 +295,47 @@ function updatePodcastList(podcasts) {
             option.textContent = `Podcast del ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
             podcastSelect.appendChild(option);
         });
+        
         // Seleziona l'ultimo podcast di default
         podcastSelect.value = podcasts[podcasts.length - 1];
-        changePodcast();
+        audioPlayer.src = podcastSelect.value;
+
+        // Aggiungi il pulsante di eliminazione
+        const deleteButton = document.createElement('button');
+        deleteButton.id = 'delete-podcast-button';
+        deleteButton.className = 'delete-podcast-button';
+        deleteButton.textContent = 'Elimina podcast';
+        deleteButton.onclick = deletePodcast;
+        podcastSelect.parentNode.insertBefore(deleteButton, podcastSelect.nextSibling);
     } else {
         podcastSection.style.display = 'none';
+        audioPlayer.src = '';
     }
 }
 
-function changePodcast() {
+function deletePodcast() {
     const podcastSelect = document.getElementById('podcast-select');
-    const audioPlayer = document.getElementById('audio-player');
-    audioPlayer.src = podcastSelect.value;
+    const selectedPodcast = podcastSelect.value;
+
+    if (selectedPodcast && confirm('Sei sicuro di voler eliminare questo podcast?')) {
+        const filename = selectedPodcast.split('/').pop();
+
+        fetch(`./api/podcasts/${filename}`, {
+            method: 'DELETE',
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Podcast eliminato con successo');
+                fetchPodcasts(); // Aggiorna la lista dei podcast
+            } else {
+                throw new Error('Errore nell\'eliminazione del podcast');
+            }
+        })
+        .catch(error => {
+            console.error('Errore nell\'eliminazione del podcast:', error);
+            alert('Si è verificato un errore durante l\'eliminazione del podcast');
+        });
+    }
 }
 
 function showGeneratePodcastModal() {
