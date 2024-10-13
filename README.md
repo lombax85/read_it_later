@@ -50,7 +50,7 @@ To run this project locally, follow these steps:
 
 6. Set up the database:
    ```
-   docker-compose exec app php src/Database.php
+   docker-compose exec app php migrate.php
    ```
 
 7. The application should now be running. Access it in your web browser at:
