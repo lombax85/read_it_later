@@ -133,6 +133,12 @@ document.getElementById('addLinkForm').addEventListener('submit', function(e) {
 });
 
 function addAndSummarizeLink(url, summaryLength, language) {
+    // Mostra l'icona di attesa
+    const loadingIcon = document.createElement('div');
+    loadingIcon.id = 'loadingIcon';
+    loadingIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Aggiunta in corso...';
+    document.body.appendChild(loadingIcon);
+
     fetch('./api/add-and-summarize', {
         method: 'POST',
         headers: {
@@ -146,12 +152,22 @@ function addAndSummarizeLink(url, summaryLength, language) {
     })
     .then(response => response.json())
     .then(data => {
-        alert(`Link aggiunto con successo!\n\nRiassunto:\n${data.summary}`);
-        fetchLinks(); // Aggiorna la lista dei link
+        // Rimuovi l'icona di attesa
+        document.body.removeChild(loadingIcon);
+
+        // Chiudi la modale
         document.getElementById('addLinkModal').style.display = 'none';
         document.getElementById('addLinkForm').reset();
+
+        // Aggiorna la pagina per mostrare il nuovo link
+        location.reload();
     })
-    .catch(error => console.error('Errore nell\'aggiunta del link e generazione del riassunto:', error));
+    .catch(error => {
+        console.error('Errore nell\'aggiunta del link e generazione del riassunto:', error);
+        // Rimuovi l'icona di attesa anche in caso di errore
+        document.body.removeChild(loadingIcon);
+        alert('Si è verificato un errore durante l\'aggiunta del link. Riprova più tardi.');
+    });
 }
 
 function deleteLink(id) {
