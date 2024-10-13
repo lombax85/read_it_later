@@ -40,14 +40,19 @@ class PodcastGenerator {
     }
 
     private function generateScript($contents, $length, $language) {
-        $combinedContent = implode("\n\n", $contents);
+        // Modifichiamo questa parte per assicurarci che tutti i contenuti vengano considerati
+        $combinedContent = "";
+        foreach ($contents as $index => $content) {
+            $combinedContent .= "Articolo " . ($index + 1) . ":\n" . $content . "\n\n";
+        }
+
         $lengthPrompt = $this->getLengthPrompt($length);
         $languagePrompt = $this->getLanguagePrompt($language);
 
         $response = $this->openaiClient->chat()->create([
             'model' => 'gpt-4o-mini',
             'messages' => [
-                ['role' => 'system', 'content' => "Sei un esperto creatore di podcast. Crea uno script scorrevole e piacevole da ascoltare basato sui seguenti contenuti. $lengthPrompt $languagePrompt"],
+                ['role' => 'system', 'content' => "Sei un esperto creatore di podcast. Crea uno script scorrevole e piacevole da ascoltare basato sui seguenti contenuti. Assicurati di includere informazioni da tutti gli articoli forniti. $lengthPrompt $languagePrompt"],
                 ['role' => 'user', 'content' => $combinedContent],
             ],
             'max_tokens' => 4000,
@@ -60,11 +65,11 @@ class PodcastGenerator {
     private function getLengthPrompt($length) {
         switch ($length) {
             case 'breve':
-                return 'Lo script deve essere conciso e durare circa 5 minuti.';
+                return 'Lo script deve essere conciso e durare circa 1 minuti per articolo.';
             case 'lungo':
-                return 'Lo script deve essere dettagliato e durare circa 15 minuti.';
+                return 'Lo script deve essere dettagliato e durare circa 5 minuti per articolo.';
             default:
-                return 'Lo script deve avere una lunghezza media e durare circa 10 minuti.';
+                return 'Lo script deve avere una lunghezza media e durare circa 3 minuti per articolo.';
         }
     }
 
