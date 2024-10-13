@@ -68,20 +68,45 @@ function updateGeneratePodcastButton() {
     }
 }
 
-function generatePodcast() {
+function generatePodcast(length, language) {
+    // Mostra l'icona di attesa
+    const loadingIcon = document.getElementById('loadingIcon');
+    loadingIcon.style.display = 'block';
+
+    // Chiudi la modale
+    document.getElementById('generatePodcastModal').style.display = 'none';
+    document.getElementById('generatePodcastForm').reset();
+
     fetch('./api/generate-podcast', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ links: selectedLinks }),
+        body: JSON.stringify({ 
+            links: selectedLinks,
+            length: length,
+            language: language
+        }),
     })
     .then(response => response.json())
     .then(data => {
-        alert('Podcast generato con successo!');
-        updatePodcastPlayer(data.podcastUrl);
+        // Simula un ritardo per dare l'illusione di una generazione in background
+        setTimeout(() => {
+            // Nascondi l'icona di attesa
+            loadingIcon.style.display = 'none';
+
+            // Aggiorna la lista dei podcast
+            fetchPodcasts();
+
+            alert('Podcast generato con successo!');
+        }, 5000); // Ritardo di 5 secondi, puoi regolarlo come preferisci
     })
-    .catch(error => console.error('Errore nella generazione del podcast:', error));
+    .catch(error => {
+        console.error('Errore nella generazione del podcast:', error);
+        // Nascondi l'icona di attesa anche in caso di errore
+        loadingIcon.style.display = 'none';
+        alert('Si è verificato un errore durante la generazione del podcast. Riprova più tardi.');
+    });
 }
 
 function updatePodcastPlayer(newPodcastUrl) {
@@ -361,46 +386,6 @@ document.getElementById('generatePodcastForm').addEventListener('submit', functi
 
     generatePodcast(length, language);
 });
-
-function generatePodcast(length, language) {
-    // Mostra l'icona di attesa
-    const loadingIcon = document.createElement('div');
-    loadingIcon.id = 'loadingIcon';
-    loadingIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generazione podcast in corso...';
-    document.body.appendChild(loadingIcon);
-
-    fetch('./api/generate-podcast', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-            links: selectedLinks,
-            length: length,
-            language: language
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Rimuovi l'icona di attesa
-        document.body.removeChild(loadingIcon);
-
-        // Chiudi la modale
-        document.getElementById('generatePodcastModal').style.display = 'none';
-        document.getElementById('generatePodcastForm').reset();
-
-        // Aggiorna la lista dei podcast
-        fetchPodcasts();
-
-        alert('Podcast generato con successo!');
-    })
-    .catch(error => {
-        console.error('Errore nella generazione del podcast:', error);
-        // Rimuovi l'icona di attesa anche in caso di errore
-        document.body.removeChild(loadingIcon);
-        alert('Si è verificato un errore durante la generazione del podcast. Riprova più tardi.');
-    });
-}
 
 // Aggiungi questa funzione per gestire il ridimensionamento della finestra
 function handleResize() {

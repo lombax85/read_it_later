@@ -276,9 +276,8 @@ h1 del + span {
 
 #loadingIcon {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 2%;
+    left: 80%;
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
     padding: 20px;
@@ -539,4 +538,33 @@ audio::-webkit-media-controls-time-remaining-display {
         width: 6px;
         height: 12px;
     }
+}
+
+.delete-podcast-button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.delete-podcast-button:hover {
+    background-color: #ff1a1a;
+}
+
+.loading-icon {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 1000;
+    max-width: 250px;
+    pointer-events: none; /* Assicura che l'icona non interferisca con i clic */
 }
