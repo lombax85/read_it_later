@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     fetchLinks();
     fetchPodcasts();
+    handleResize();
 });
 
 let selectedLinks = [];
@@ -25,17 +26,21 @@ function createLinkElement(link) {
     const div = document.createElement('div');
     div.className = 'link-item';
     div.innerHTML = `
-        <label class="link-checkbox">
-            <input type="checkbox" onchange="toggleLinkSelection(${link.id}, '${link.url}')">
-            <span class="checkmark"></span>
-        </label>
-        <h3>${link.title || 'Titolo non disponibile'}</h3>
+        <div class="link-header">
+            <label class="link-checkbox">
+                <input type="checkbox" onchange="toggleLinkSelection(${link.id}, '${link.url}')">
+                <span class="checkmark"></span>
+            </label>
+            <h3>${link.title || 'Titolo non disponibile'}</h3>
+        </div>
         <p>${link.category || 'Categoria non disponibile'}</p>
         <a href="${link.url || '#'}" target="_blank">${link.url ? 'Visita il link' : 'URL non disponibile'}</a>
-        <button onclick="generateOrShowSummary(${link.id}, '${link.url || ''}')">
-            ${link.summary ? 'Mostra Riassunto' : 'Genera Riassunto'}
-        </button>
-        <button onclick="deleteLink(${link.id})">Elimina</button>
+        <div class="link-actions">
+            <button onclick="generateOrShowSummary(${link.id}, '${link.url || ''}')">
+                ${link.summary ? 'Mostra Riassunto' : 'Genera Riassunto'}
+            </button>
+            <button onclick="deleteLink(${link.id})">Elimina</button>
+        </div>
         <div id="accordion-item-${link.id}" class="accordion-item"></div>
     `;
     return div;
@@ -352,3 +357,19 @@ function generatePodcast(length, language) {
         alert('Si è verificato un errore durante la generazione del podcast. Riprova più tardi.');
     });
 }
+
+// Aggiungi questa funzione per gestire il ridimensionamento della finestra
+function handleResize() {
+    const width = window.innerWidth;
+    const linkItems = document.querySelectorAll('.link-item');
+    linkItems.forEach(item => {
+        if (width <= 768) {
+            item.classList.add('mobile-view');
+        } else {
+            item.classList.remove('mobile-view');
+        }
+    });
+}
+
+// Aggiungi questi listener
+window.addEventListener('resize', handleResize);

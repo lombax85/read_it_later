@@ -426,3 +426,117 @@ audio::-webkit-media-controls-time-remaining-display {
         width: 100%;
     }
 }
+
+/* Stili responsive generali */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .add-link-button,
+    #generatePodcastButton {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #link-list {
+        margin-top: 20px;
+    }
+
+    .link-item {
+        padding: 15px;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+    }
+}
+
+/* Miglioramenti per il podcast player su mobile */
+@media (max-width: 768px) {
+    #podcast-section {
+        padding: 15px;
+    }
+
+    #podcast-player {
+        width: 100%;
+    }
+
+    #podcast-select {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #audio-player {
+        width: 100%;
+    }
+}
+
+/* Miglioramenti per i form su mobile */
+@media (max-width: 768px) {
+    #addLinkForm input,
+    #addLinkForm select,
+    #generatePodcastForm select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+
+    #addLinkForm button,
+    #generatePodcastForm button {
+        width: 100%;
+        padding: 12px;
+    }
+}
+
+/* Miglioramenti per l'accordion su mobile */
+@media (max-width: 768px) {
+    .accordion-header {
+        padding: 15px;
+    }
+
+    .accordion-content {
+        padding: 10px;
+    }
+}
+
+/* Stile per migliorare la leggibilità su schermi piccoli */
+@media (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    .link-item h3 {
+        font-size: 1.2em;
+    }
+}
+
+/* Miglioramenti generali per l'usabilità su touch screen */
+@media (hover: none) {
+    .add-link-button,
+    #generatePodcastButton,
+    .link-item button {
+        padding: 12px 20px;
+    }
+
+    .link-checkbox .checkmark {
+        width: 30px;
+        height: 30px;
+    }
+
+    .link-checkbox .checkmark:after {
+        left: 11px;
+        top: 7px;
+        width: 6px;
+        height: 12px;
+    }
+}

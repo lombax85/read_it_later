@@ -13,12 +13,14 @@
 <body>
     <div id="app">
         <h1>Read It <del>Later</del> Never</h1>
-        <button class="add-link-button" onclick="showAddLinkModal()">
-            <i class="fas fa-plus-circle"></i> Aggiungi e Riassumi Link
-        </button>
-        <button id="generatePodcastButton" class="generate-podcast-button" onclick="showGeneratePodcastModal()">
-            Genera Podcast
-        </button>
+        <div class="button-container">
+            <button class="add-link-button" onclick="showAddLinkModal()">
+                <i class="fas fa-plus-circle"></i> Aggiungi e Riassumi Link
+            </button>
+            <button id="generatePodcastButton" class="generate-podcast-button" onclick="showGeneratePodcastModal()">
+                Genera Podcast
+            </button>
+        </div>
         
         <!-- Nuova sezione per il player del podcast -->
         <div id="podcast-section" style="display: none;">
