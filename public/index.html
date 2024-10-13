@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Read It Later</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <!-- Aggiungiamo Font Awesome per l'icona -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Aggiungiamo la libreria marked per il parsing del markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1>Read It Later</h1>
+        <button class="add-link-button" onclick="showAddLinkModal()">
+            <i class="fas fa-plus-circle"></i> Aggiungi e Riassumi Link
+        </button>
+        <div id="link-list"></div>
+    </div>
+
+    <!-- Aggiungi questa sezione per la modale -->
+    <div id="addLinkModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Aggiungi un nuovo link</h2>
+            <form id="addLinkForm">
+                <label for="url">URL:</label>
+                <input type="url" id="url" name="url" required>
+                
+                <label for="summaryLength">Lunghezza del riassunto:</label>
+                <select id="summaryLength" name="summaryLength">
+                    <option value="breve">Breve</option>
+                    <option value="medio" selected>Medio</option>
+                    <option value="lungo">Lungo</option>
+                </select>
+                
+                <label for="language">Lingua del riassunto:</label>
+                <select id="language" name="language">
+                    <option value="italiano" selected>Italiano</option>
+                    <option value="inglese">Inglese</option>
+                    <option value="francese">Francese</option>
+                    <option value="spagnolo">Spagnolo</option>
+                    <option value="tedesco">Tedesco</option>
+                </select>
+                
+                <button type="submit">Aggiungi e Riassumi</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="./js/app.js"></script>
+</body>
+</html>

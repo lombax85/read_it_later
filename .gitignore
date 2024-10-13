@@ -1,0 +1,57 @@
+# Dipendenze
+/vendor/
+
+# File di configurazione
+.env
+
+# File di cache
+*.cache
+
+# File di log
+*.log
+
+# File temporanei
+*.tmp
+*.swp
+*.swo
+
+# File di sistema
+.DS_Store
+Thumbs.db
+
+# Directory IDE/Editor
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# File di configurazione PHP
+php.ini
+
+# File di configurazione Composer
+composer.phar
+
+# File di build
+/build/
+
+# File di backup
+*.bak
+
+# File di sessione PHP
+/sessions/
+
+# File di upload (se applicabile)
+/uploads/
+
+# File di configurazione specifici dell'ambiente
+.env.*
+!.env.example
+
+# File di cache di PHPUnit
+.phpunit.result.cache
+
+# SQLite database
+/database/*.sqlite
+
+# Altri file/cartelle specifici del progetto (aggiungi secondo necessità)
+sync.sh
