@@ -55,3 +55,6 @@ composer.phar
 
 # Altri file/cartelle specifici del progetto (aggiungi secondo necessità)
 sync.sh
+# ignore Podcasts except .gitkeep
+/public/podcasts/*
+!.gitkeep

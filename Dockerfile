@@ -6,7 +6,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
-    libsqlite3-dev
+    libsqlite3-dev \
+    ffmpeg
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_sqlite zip
@@ -26,9 +27,11 @@ COPY . .
 # Install dependencies
 RUN composer install --no-interaction --no-dev --prefer-dist
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+# Create necessary directories and set permissions
+RUN mkdir -p /var/www/html/public/podcasts \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 777 /var/www/html/public/podcasts
 
 # Configure Apache
 RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf

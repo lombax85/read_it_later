@@ -12,6 +12,19 @@ h1 {
     color: #2c3e50;
     text-align: center;
     margin-bottom: 30px;
+    font-size: 2.5em;
+    font-weight: bold;
+}
+
+h1 del {
+    color: #e74c3c;
+    text-decoration: line-through;
+    font-weight: normal;
+}
+
+h1 del + span {
+    color: #27ae60;
+    font-weight: bold;
 }
 
 #add-link-btn {
