@@ -18,6 +18,7 @@ function fetchLinks() {
                 const linkElement = createLinkElement(link);
                 linkList.appendChild(linkElement);
             });
+            updateGeneratePodcastButton(); // Assicurati che questa riga sia presente
         })
         .catch(error => console.error('Errore nel recupero dei link:', error));
 }
