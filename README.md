@@ -43,12 +43,17 @@ To run this project locally, follow these steps:
    docker-compose up -d --build
    ```
 
-5. Set up the database:
+5. Install PHP dependencies using Composer:
+   ```
+   docker-compose run --rm app composer install
+   ```
+
+6. Set up the database:
    ```
    docker-compose exec app php src/Database.php
    ```
 
-6. The application should now be running. Access it in your web browser at:
+7. The application should now be running. Access it in your web browser at:
    ```
    http://localhost:8080
    ```

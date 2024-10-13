@@ -25,7 +25,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Install dependencies
-RUN composer install --no-interaction --no-dev --prefer-dist
+# RUN composer install --no-interaction --no-dev --prefer-dist
 
 # Create necessary directories and set permissions
 RUN mkdir -p /var/www/html/public/podcasts \
