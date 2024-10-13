@@ -50,7 +50,7 @@ class PodcastGenerator {
         $languagePrompt = $this->getLanguagePrompt($language);
 
         $response = $this->openaiClient->chat()->create([
-            'model' => 'gpt-4o-mini',
+            'model' => 'gpt-4o',
             'messages' => [
                 ['role' => 'system', 'content' => "Sei un esperto creatore di podcast. Crea uno script scorrevole e piacevole da ascoltare basato sui seguenti contenuti. Assicurati di includere informazioni da tutti gli articoli forniti. $lengthPrompt $languagePrompt"],
                 ['role' => 'user', 'content' => $combinedContent],
@@ -65,11 +65,11 @@ class PodcastGenerator {
     private function getLengthPrompt($length) {
         switch ($length) {
             case 'breve':
-                return 'Lo script deve essere conciso e durare circa 1 minuti per articolo, la durata è molto importante e cerca di rispettarla.';
+                return 'Lo script deve essere conciso e di circa 500 parole. La lunghezza è molto importante e cerca di rispettarla.';
             case 'lungo':
-                return 'Lo script deve essere dettagliato e durare circa 5 minuti per articolo, la durata è molto importante e cerca di rispettarla.';
+                return 'Lo script deve essere molto dettagliato e di circa 4000 parole. La lunghezza è molto importante e cerca di rispettarla.';
             default:
-                return 'Lo script deve avere una lunghezza media e durare circa 3 minuti per articolo, la durata è molto importante e cerca di rispettarla.';
+                return 'Lo script deve avere una lunghezza media con circa 1500 parole. La lunghezza è molto importante e cerca di rispettarla.';
         }
     }
 

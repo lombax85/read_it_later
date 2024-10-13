@@ -133,9 +133,11 @@ $app->delete('/api/links/{id}', function ($request, $response, $args) {
 $app->post('/api/generate-podcast', function ($request, $response) {
     $data = $request->getParsedBody();
     $linkIds = array_column($data['links'], 'id');
+    $length = $data['length'] ?? 'medio';  // Aggiungiamo il parametro length
+    $language = $data['language'] ?? 'italiano';  // Aggiungiamo il parametro language
 
     $podcastGenerator = new PodcastGenerator();
-    $podcastUrl = $podcastGenerator->generate($linkIds);
+    $podcastUrl = $podcastGenerator->generate($linkIds, $length, $language);
 
     return $response->withJson(['podcastUrl' => $podcastUrl]);
 });
