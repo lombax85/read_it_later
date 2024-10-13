@@ -568,3 +568,18 @@ audio::-webkit-media-controls-time-remaining-display {
     max-width: 250px;
     pointer-events: none; /* Assicura che l'icona non interferisca con i clic */
 }
+
+/* Aggiungi o modifica questa regola per il pulsante di generazione del podcast */
+#generatePodcastForm button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#generatePodcastForm button[type="submit"]:hover {
+    background-color: #45a049;
+}

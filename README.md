@@ -53,9 +53,9 @@ To run this project locally, follow these steps:
    docker-compose exec app php migrate.php
    ```
 
-7. Fix database permissions (if necessary):
+7. Fix permissions (could be necessary because we are mounting the current project root):
    ```
-   docker-compose exec app chown -R www-data:www-data database/
+   docker-compose exec app chown -R www-data:www-data *
    ```
 
 8. The application should now be running. Access it in your web browser at:
