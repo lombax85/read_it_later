@@ -18,10 +18,10 @@ class PodcastGenerator {
         $this->contentExtractor = new ContentExtractor();
     }
 
-    public function generate($linkIds) {
+    public function generate($linkIds, $length = 'medio', $language = 'italiano') {
         $contents = $this->getContents($linkIds);
-        $script = $this->generateScript($contents);
-        $audioFile = $this->generateAudio($script);
+        $script = $this->generateScript($contents, $length, $language);
+        $audioFile = $this->generateAudio($script, $language);
         return $audioFile;
     }
 
@@ -39,12 +39,15 @@ class PodcastGenerator {
         return $contents;
     }
 
-    private function generateScript($contents) {
+    private function generateScript($contents, $length, $language) {
         $combinedContent = implode("\n\n", $contents);
+        $lengthPrompt = $this->getLengthPrompt($length);
+        $languagePrompt = $this->getLanguagePrompt($language);
+
         $response = $this->openaiClient->chat()->create([
             'model' => 'gpt-4o-mini',
             'messages' => [
-                ['role' => 'system', 'content' => 'Sei un esperto creatore di podcast. Crea uno script scorrevole e piacevole da ascoltare basato sui seguenti contenuti.'],
+                ['role' => 'system', 'content' => "Sei un esperto creatore di podcast. Crea uno script scorrevole e piacevole da ascoltare basato sui seguenti contenuti. $lengthPrompt $languagePrompt"],
                 ['role' => 'user', 'content' => $combinedContent],
             ],
             'max_tokens' => 4000,
@@ -54,14 +57,29 @@ class PodcastGenerator {
         return $response->choices[0]->message->content;
     }
 
-    private function generateAudio($script) {
+    private function getLengthPrompt($length) {
+        switch ($length) {
+            case 'breve':
+                return 'Lo script deve essere conciso e durare circa 5 minuti.';
+            case 'lungo':
+                return 'Lo script deve essere dettagliato e durare circa 15 minuti.';
+            default:
+                return 'Lo script deve avere una lunghezza media e durare circa 10 minuti.';
+        }
+    }
+
+    private function getLanguagePrompt($language) {
+        return "Genera lo script in $language.";
+    }
+
+    private function generateAudio($script, $language) {
         $segments = $this->splitScript($script);
         $audioFiles = [];
 
         foreach ($segments as $index => $segment) {
             $response = $this->openaiClient->audio()->speech([
                 'model' => 'tts-1',
-                'voice' => 'alloy',
+                'voice' => $this->getVoiceForLanguage($language),
                 'input' => $segment
             ]);
 
@@ -108,5 +126,22 @@ class PodcastGenerator {
     private function mergeAudioFiles($files, $output) {
         $command = "ffmpeg -i \"concat:" . implode('|', $files) . "\" -acodec copy {$output}";
         exec($command);
+    }
+
+    private function getVoiceForLanguage($language) {
+        switch ($language) {
+            case 'inglese':
+                return 'alloy';
+            case 'italiano':
+                return 'nova';
+            case 'francese':
+                return 'lea';
+            case 'spagnolo':
+                return 'bella';
+            case 'tedesco':
+                return 'onyx';
+            default:
+                return 'alloy';
+        }
     }
 }

@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     fetchLinks();
+    fetchPodcasts();
 });
 
 let selectedLinks = [];
@@ -249,4 +250,105 @@ function deleteLink(id) {
         })
         .catch(error => console.error('Errore nella cancellazione del link:', error));
     }
+}
+
+function fetchPodcasts() {
+    fetch('./api/podcasts')
+        .then(response => response.json())
+        .then(podcasts => {
+            updatePodcastList(podcasts);
+        })
+        .catch(error => console.error('Errore nel recupero dei podcast:', error));
+}
+
+function updatePodcastList(podcasts) {
+    const podcastSelect = document.getElementById('podcast-select');
+    const podcastSection = document.getElementById('podcast-section');
+    
+    if (podcasts.length > 0) {
+        podcastSection.style.display = 'block';
+        podcastSelect.innerHTML = '';
+        podcasts.forEach((podcast, index) => {
+            const option = document.createElement('option');
+            option.value = podcast;
+            const date = new Date(podcast.match(/podcast_(\d+)\.mp3/)[1] * 1000);
+            option.textContent = `Podcast del ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+            podcastSelect.appendChild(option);
+        });
+        // Seleziona l'ultimo podcast di default
+        podcastSelect.value = podcasts[podcasts.length - 1];
+        changePodcast();
+    } else {
+        podcastSection.style.display = 'none';
+    }
+}
+
+function changePodcast() {
+    const podcastSelect = document.getElementById('podcast-select');
+    const audioPlayer = document.getElementById('audio-player');
+    audioPlayer.src = podcastSelect.value;
+}
+
+function showGeneratePodcastModal() {
+    const modal = document.getElementById('generatePodcastModal');
+    modal.style.display = 'block';
+
+    const closeBtn = modal.querySelector('.close');
+    closeBtn.onclick = function() {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+}
+
+document.getElementById('generatePodcastForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const length = document.getElementById('podcastLength').value;
+    const language = document.getElementById('podcastLanguage').value;
+
+    generatePodcast(length, language);
+});
+
+function generatePodcast(length, language) {
+    // Mostra l'icona di attesa
+    const loadingIcon = document.createElement('div');
+    loadingIcon.id = 'loadingIcon';
+    loadingIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generazione podcast in corso...';
+    document.body.appendChild(loadingIcon);
+
+    fetch('./api/generate-podcast', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            links: selectedLinks,
+            length: length,
+            language: language
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Rimuovi l'icona di attesa
+        document.body.removeChild(loadingIcon);
+
+        // Chiudi la modale
+        document.getElementById('generatePodcastModal').style.display = 'none';
+        document.getElementById('generatePodcastForm').reset();
+
+        // Aggiorna la lista dei podcast
+        fetchPodcasts();
+
+        alert('Podcast generato con successo!');
+    })
+    .catch(error => {
+        console.error('Errore nella generazione del podcast:', error);
+        // Rimuovi l'icona di attesa anche in caso di errore
+        document.body.removeChild(loadingIcon);
+        alert('Si è verificato un errore durante la generazione del podcast. Riprova più tardi.');
+    });
 }

@@ -16,18 +16,27 @@
         <button class="add-link-button" onclick="showAddLinkModal()">
             <i class="fas fa-plus-circle"></i> Aggiungi e Riassumi Link
         </button>
-        <button id="generatePodcastButton" class="generate-podcast-button" style="display: none;" onclick="generatePodcast()">
+        <button id="generatePodcastButton" class="generate-podcast-button" onclick="showGeneratePodcastModal()">
             Genera Podcast
         </button>
-        <div id="link-list"></div>
-        <div id="podcast-player" style="display: none;">
-            <h2>Podcast</h2>
-            <audio id="audio-player" controls></audio>
-            <select id="podcast-select" onchange="changePodcast()"></select>
+        
+        <!-- Nuova sezione per il player del podcast -->
+        <div id="podcast-section" style="display: none;">
+            <div id="podcast-player">
+                <h2>Ascolta il Podcast</h2>
+                <select id="podcast-select" onchange="changePodcast()">
+                    <option value="">Seleziona un podcast</option>
+                </select>
+                <audio id="audio-player" controls>
+                    Il tuo browser non supporta l'elemento audio.
+                </audio>
+            </div>
         </div>
+
+        <div id="link-list"></div>
     </div>
 
-    <!-- Aggiungi questa sezione per la modale -->
+    <!-- Modale per l'aggiunta di link (esistente) -->
     <div id="addLinkModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -53,6 +62,33 @@
                 </select>
                 
                 <button type="submit">Aggiungi e Riassumi</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Nuova modale per la generazione del podcast -->
+    <div id="generatePodcastModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Genera un nuovo podcast</h2>
+            <form id="generatePodcastForm">
+                <label for="podcastLength">Lunghezza del podcast:</label>
+                <select id="podcastLength" name="podcastLength">
+                    <option value="breve">Breve</option>
+                    <option value="medio" selected>Medio</option>
+                    <option value="lungo">Lungo</option>
+                </select>
+                
+                <label for="podcastLanguage">Lingua del podcast:</label>
+                <select id="podcastLanguage" name="podcastLanguage">
+                    <option value="italiano" selected>Italiano</option>
+                    <option value="inglese">Inglese</option>
+                    <option value="francese">Francese</option>
+                    <option value="spagnolo">Spagnolo</option>
+                    <option value="tedesco">Tedesco</option>
+                </select>
+                
+                <button type="submit">Genera Podcast</button>
             </form>
         </div>
     </div>

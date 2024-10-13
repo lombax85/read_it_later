@@ -363,3 +363,66 @@ h1 del + span {
     border-width: 0 3px 3px 0;
     transform: rotate(45deg);
 }
+
+/* Stile per la sezione del podcast */
+#podcast-section {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#podcast-player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#podcast-player h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+#podcast-select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 16px;
+    color: #333;
+}
+
+#audio-player {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Stile personalizzato per il player audio */
+audio::-webkit-media-controls-panel {
+    background-color: #f8f8f8;
+}
+
+audio::-webkit-media-controls-play-button {
+    background-color: #007bff;
+    border-radius: 50%;
+}
+
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+    color: #333;
+}
+
+/* Responsive design per schermi più piccoli */
+@media (max-width: 768px) {
+    #podcast-section {
+        padding: 15px;
+    }
+
+    #podcast-select,
+    #audio-player {
+        width: 100%;
+    }
+}
