@@ -121,4 +121,10 @@ class Link implements JsonSerializable {
         $stmt = $db->prepare("DELETE FROM links WHERE id = ?");
         $stmt->execute([$this->id]);
     }
+
+    public function getFullContent() {
+        $contentExtractor = new \App\Services\ContentExtractor();
+        $content = $contentExtractor->extract($this->url);
+        return $content ? $content['content'] : null;
+    }
 }

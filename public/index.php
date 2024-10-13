@@ -22,6 +22,7 @@ use App\Models\Link;
 use App\Services\ContentExtractor;
 use App\Services\SummaryGenerator;
 use App\Services\LinkCategorizer;
+use App\Services\PodcastGenerator;
 
 // Inizializzazione dell'applicazione
 $app = new App();
@@ -127,6 +128,26 @@ $app->delete('/api/links/{id}', function ($request, $response, $args) {
     } else {
         return $response->withStatus(404)->withJson(['error' => 'Link non trovato']);
     }
+});
+
+$app->post('/api/generate-podcast', function ($request, $response) {
+    $data = $request->getParsedBody();
+    $linkIds = array_column($data['links'], 'id');
+
+    $podcastGenerator = new PodcastGenerator();
+    $podcastUrl = $podcastGenerator->generate($linkIds);
+
+    return $response->withJson(['podcastUrl' => $podcastUrl]);
+});
+
+$app->get('/api/podcasts', function ($request, $response) {
+    $podcastDir = __DIR__ . '/podcasts';
+    $podcasts = glob($podcastDir . '/*.mp3');
+    $podcastUrls = array_map(function ($path) {
+        return '/podcasts/' . basename($path);
+    }, $podcasts);
+
+    return $response->withJson($podcastUrls);
 });
 
 // Esecuzione dell'applicazione

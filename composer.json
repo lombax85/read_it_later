@@ -3,12 +3,17 @@
         "slim/slim": "^3.12",
         "guzzlehttp/guzzle": "^7.0",
         "andreskrey/readability.php": "^2.1",
-        "openai-php/client": "^0.3.0",
-        "vlucas/phpdotenv": "^5.6"
+        "vlucas/phpdotenv": "^5.6",
+        "openai-php/client": "^0.10.1"
     },
     "autoload": {
         "psr-4": {
             "App\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
         }
     }
 }

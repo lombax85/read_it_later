@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchLinks();
 });
 
+let selectedLinks = [];
+
 function fetchLinks() {
     fetch('./api/links')
         .then(response => response.json())
@@ -22,6 +24,10 @@ function createLinkElement(link) {
     const div = document.createElement('div');
     div.className = 'link-item';
     div.innerHTML = `
+        <label class="link-checkbox">
+            <input type="checkbox" onchange="toggleLinkSelection(${link.id}, '${link.url}')">
+            <span class="checkmark"></span>
+        </label>
         <h3>${link.title || 'Titolo non disponibile'}</h3>
         <p>${link.category || 'Categoria non disponibile'}</p>
         <a href="${link.url || '#'}" target="_blank">${link.url ? 'Visita il link' : 'URL non disponibile'}</a>
@@ -32,6 +38,65 @@ function createLinkElement(link) {
         <div id="accordion-item-${link.id}" class="accordion-item"></div>
     `;
     return div;
+}
+
+function toggleLinkSelection(id, url) {
+    const index = selectedLinks.findIndex(link => link.id === id);
+    if (index === -1) {
+        selectedLinks.push({ id, url });
+    } else {
+        selectedLinks.splice(index, 1);
+    }
+    updateGeneratePodcastButton();
+}
+
+function updateGeneratePodcastButton() {
+    const button = document.getElementById('generatePodcastButton');
+    if (selectedLinks.length > 0) {
+        button.style.display = 'inline-block';
+        button.classList.add('generate-podcast-button');
+    } else {
+        button.style.display = 'none';
+        button.classList.remove('generate-podcast-button');
+    }
+}
+
+function generatePodcast() {
+    fetch('./api/generate-podcast', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ links: selectedLinks }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert('Podcast generato con successo!');
+        updatePodcastPlayer(data.podcastUrl);
+    })
+    .catch(error => console.error('Errore nella generazione del podcast:', error));
+}
+
+function updatePodcastPlayer(newPodcastUrl) {
+    const podcastPlayer = document.getElementById('podcast-player');
+    const audioPlayer = document.getElementById('audio-player');
+    const podcastSelect = document.getElementById('podcast-select');
+
+    podcastPlayer.style.display = 'block';
+    audioPlayer.src = newPodcastUrl;
+
+    // Aggiungi il nuovo podcast alla lista
+    const option = document.createElement('option');
+    option.value = newPodcastUrl;
+    option.textContent = `Podcast ${podcastSelect.options.length + 1}`;
+    podcastSelect.appendChild(option);
+    podcastSelect.value = newPodcastUrl;
+}
+
+function changePodcast() {
+    const podcastSelect = document.getElementById('podcast-select');
+    const audioPlayer = document.getElementById('audio-player');
+    audioPlayer.src = podcastSelect.value;
 }
 
 function generateOrShowSummary(id, url) {

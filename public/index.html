@@ -16,7 +16,15 @@
         <button class="add-link-button" onclick="showAddLinkModal()">
             <i class="fas fa-plus-circle"></i> Aggiungi e Riassumi Link
         </button>
+        <button id="generatePodcastButton" class="generate-podcast-button" style="display: none;" onclick="generatePodcast()">
+            Genera Podcast
+        </button>
         <div id="link-list"></div>
+        <div id="podcast-player" style="display: none;">
+            <h2>Podcast</h2>
+            <audio id="audio-player" controls></audio>
+            <select id="podcast-select" onchange="changePodcast()"></select>
+        </div>
     </div>
 
     <!-- Aggiungi questa sezione per la modale -->

@@ -272,3 +272,81 @@ h1 {
     border-radius: 5px;
     z-index: 1000;
 }
+
+/* Aggiungi questi stili al tuo file CSS esistente */
+
+/* Stile per il bottone "Genera Podcast" */
+#generatePodcastButton {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+#generatePodcastButton:hover {
+    background-color: #45a049;
+}
+
+/* Stile per le caselle di selezione */
+.link-checkbox {
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+}
+
+.link-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border-radius: 4px;
+}
+
+.link-checkbox:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+.link-checkbox input:checked ~ .checkmark {
+    background-color: #2196F3;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.link-checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.link-checkbox .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
