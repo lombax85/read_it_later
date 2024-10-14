@@ -4,32 +4,51 @@ document.addEventListener('DOMContentLoaded', function() {
     handleResize();
     changePodcast();
     initializeAccordion(); // Aggiungi questa chiamata
+
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', function() {
+        filterLinks(this.value);
+    });
 });
 
 let selectedLinks = [];
+let allLinks = [];
 
 function fetchLinks() {
     fetch('./api/links')
         .then(response => response.json())
         .then(links => {
             console.log('Links received from backend:', links);
-            const unreadLinkList = document.getElementById('unread-link-list');
-            const readLinkList = document.getElementById('read-link-list');
-            unreadLinkList.innerHTML = '';
-            readLinkList.innerHTML = '';
-            
-            links.forEach(link => {
-                const linkElement = createLinkElement(link);
-                if (link.isRead) {
-                    readLinkList.appendChild(linkElement);
-                } else {
-                    unreadLinkList.appendChild(linkElement);
-                }
-            });
+            allLinks = links; // Salva tutti i link
+            renderLinks(links);
             updateGeneratePodcastButton();
             initializeReadLinksAccordion();
         })
         .catch(error => console.error('Errore nel recupero dei link:', error));
+}
+
+function renderLinks(links) {
+    const unreadLinkList = document.getElementById('unread-link-list');
+    const readLinkList = document.getElementById('read-link-list');
+    unreadLinkList.innerHTML = '';
+    readLinkList.innerHTML = '';
+    
+    links.forEach(link => {
+        const linkElement = createLinkElement(link);
+        if (link.isRead) {
+            readLinkList.appendChild(linkElement);
+        } else {
+            unreadLinkList.appendChild(linkElement);
+        }
+    });
+}
+
+function filterLinks(searchTerm) {
+    const filteredLinks = allLinks.filter(link => 
+        link.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        link.category.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    renderLinks(filteredLinks);
 }
 
 function createLinkElement(link) {

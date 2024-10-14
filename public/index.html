@@ -35,6 +35,19 @@
             color: #666;
             margin-bottom: 5px;
         }
+        .search-container {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+        #searchInput {
+            width: 100%;
+            max-width: 600px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -52,6 +65,11 @@
             <button id="generatePodcastButton" class="generate-podcast-button" onclick="showGeneratePodcastModal()">
                 Genera Podcast
             </button>
+        </div>
+        
+        <!-- Spostiamo la barra di ricerca qui -->
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Cerca per titolo o categoria...">
         </div>
         
         <!-- Nuova sezione per il player del podcast -->
@@ -76,6 +94,8 @@
             <button id="read-links-toggle">Mostra link letti</button>
             <div id="read-link-list" style="display: none;"></div>
         </div>
+        
+        <!-- Aggiungi questo codice subito dopo il div con classe "button-container" -->
     </div>
 
     <!-- Modale per l'aggiunta di link (esistente) -->
