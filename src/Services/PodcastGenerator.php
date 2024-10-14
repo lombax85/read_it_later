@@ -52,7 +52,7 @@ class PodcastGenerator {
         $response = $this->openaiClient->chat()->create([
             'model' => 'gpt-4o',
             'messages' => [
-                ['role' => 'system', 'content' => "Sei un esperto creatore di podcast. Crea uno script scorrevole e piacevole da ascoltare basato sui seguenti contenuti. Assicurati di includere informazioni da tutti gli articoli forniti. $lengthPrompt $languagePrompt"],
+                ['role' => 'system', 'content' => "Sei un podcaster esperto. Crea uno script scorrevole e piacevole da ascoltare basato sui seguenti contenuti. Non mettere mai placeholder per il nome del podcaster nello script, il podcaster sei tu. Assicurati di includere informazioni da tutti gli articoli forniti. $lengthPrompt $languagePrompt"],
                 ['role' => 'user', 'content' => $combinedContent],
             ],
             'max_tokens' => 8000,
