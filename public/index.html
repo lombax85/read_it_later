@@ -93,6 +93,73 @@
         .link-actions button {
             margin-right: 5px;
         }
+
+        /* Stili per la modale */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Stili responsivi per dispositivi mobili */
+        @media screen and (max-width: 600px) {
+            .modal-content {
+                width: 85%;
+                margin: 5% auto;
+                padding: 15px;
+            }
+
+            .modal-content h2 {
+                font-size: 1.2em;
+            }
+
+            .modal-content input,
+            .modal-content select,
+            .modal-content textarea {
+                width: 100%;
+                padding: 8px;
+                margin-bottom: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+
+            .modal-content button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
