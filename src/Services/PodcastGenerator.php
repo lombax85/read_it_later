@@ -30,9 +30,9 @@ class PodcastGenerator {
         foreach ($linkIds as $id) {
             $link = Link::getById($id);
             if ($link) {
-                $content = $this->contentExtractor->extract($link->getUrl());
+                $content = $link->getContent();
                 if ($content) {
-                    $contents[] = $content['content'];
+                    $contents[] = $content;
                 }
             }
         }

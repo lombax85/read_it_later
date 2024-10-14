@@ -15,10 +15,11 @@ class Link implements JsonSerializable {
     private $createdAt;
     private $content;
 
-    public function __construct($url = null, $title = null, $category = null) {
+    public function __construct($url = null, $title = null, $category = null, $content = null) {
         $this->url = $url;
         $this->title = $title;
         $this->category = $category;
+        $this->content = $content;
         $this->createdAt = date('Y-m-d H:i:s');
     }
 
@@ -55,10 +56,11 @@ class Link implements JsonSerializable {
         
         $linkObjects = [];
         foreach ($links as $link) {
-            $linkObject = new self($link['url'], $link['title'], $link['category']);
+            $linkObject = new self($link['url'], $link['title'], $link['category'], $link['content']);
             $linkObject->id = $link['id'];
             $linkObject->summary = $link['summary'];
             $linkObject->createdAt = $link['created_at'];
+            $linkObject->content = $link['content'];
             $linkObjects[] = $linkObject;
         }
         
@@ -75,10 +77,11 @@ class Link implements JsonSerializable {
         
         $linkObjects = [];
         foreach ($links as $link) {
-            $linkObject = new self($link['url'], $link['title'], $link['category']);
+            $linkObject = new self($link['url'], $link['title'], $link['category'], $link['content']);
             $linkObject->id = $link['id'];
             $linkObject->summary = $link['summary'];
             $linkObject->createdAt = $link['created_at'];
+            $linkObject->content = $link['content'];
             $linkObjects[] = $linkObject;
         }
         
@@ -99,10 +102,11 @@ class Link implements JsonSerializable {
         $link = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($link) {
-            $linkObject = new self($link['url'], $link['title'], $link['category']);
+            $linkObject = new self($link['url'], $link['title'], $link['category'], $link['content']);
             $linkObject->id = $link['id'];
             $linkObject->summary = $link['summary'];
             $linkObject->createdAt = $link['created_at'];
+            $linkObject->content = $link['content'];
             return $linkObject;
         }
         
@@ -125,11 +129,5 @@ class Link implements JsonSerializable {
         $db = Database::getInstance()->getConnection();
         $stmt = $db->prepare("DELETE FROM links WHERE id = ?");
         $stmt->execute([$this->id]);
-    }
-
-    public function getFullContent() {
-        $contentExtractor = new \App\Services\ContentExtractor();
-        $content = $contentExtractor->extract($this->url);
-        return $content ? $content['content'] : null;
     }
 }
