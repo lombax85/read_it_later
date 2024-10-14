@@ -7,7 +7,16 @@ use andreskrey\Readability\Readability;
 use andreskrey\Readability\Configuration;
 
 class ContentExtractor {
-    public function extract($url) {
+    public function extract($url, $manualContent = null) {
+        if ($manualContent !== null) {
+            // Se c'è contenuto manuale, genera un titolo da esso
+            $title = $this->generateTitleFromContent($manualContent);
+            return [
+                'title' => $title,
+                'content' => $manualContent
+            ];
+        }
+
         $html = $this->fetchContent($url);
         $readability = new Readability(new Configuration());
 
@@ -21,6 +30,13 @@ class ContentExtractor {
             error_log("Errore nell'estrazione del contenuto: " . $e->getMessage());
             return null;
         }
+    }
+
+    private function generateTitleFromContent($content) {
+        // Estrai le prime parole del contenuto come titolo
+        $words = str_word_count(strip_tags($content), 1);
+        $title = implode(' ', array_slice($words, 0, 20)); // Prendi le prime 20 parole
+        return $title . '...'; // Aggiungi puntini di sospensione
     }
 
     private function fetchContent($url) {

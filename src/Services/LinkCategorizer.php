@@ -23,8 +23,9 @@ class LinkCategorizer {
         ]);
     }
 
-    public function categorize($url) {
-        $content = $this->fetchContent($url);
+    public function categorize($url, $manualContent = null) {
+        $content = $manualContent ?? $this->fetchContent($url);
+        error_log("Manual Content: " . $manualContent);
 
         $response = $this->openaiClient->chat()->create([
             'model' => 'gpt-4o-mini',

@@ -68,7 +68,7 @@ $app->post('/api/add-and-summarize', function ($request, $response) {
 
     // Estrai il contenuto
     $extractor = new ContentExtractor();
-    $content = $manualContent ? ['content' => $manualContent, 'title' => 'Titolo non disponibile'] : $extractor->extract($url);
+    $content = $extractor->extract($url, $manualContent);
 
     if ($content) {
         try {
@@ -78,10 +78,10 @@ $app->post('/api/add-and-summarize', function ($request, $response) {
 
             // Categorizza il link
             $categorizer = new LinkCategorizer();
-            $category = $categorizer->categorize($url);
+            $category = $categorizer->categorize($url, $manualContent);
 
             // Salva il link
-            $link = new Link($url, $content['title'] ?? 'Titolo non disponibile', $category);
+            $link = new Link($url, $content['title'], $category);
             $link->setSummary($summary);
             $link->setContent($content['content']);
             $link->save();
