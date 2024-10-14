@@ -276,10 +276,15 @@ function addAndSummarizeLink(url, summaryLength, language, manualContent) {
             url: url,
             summaryLength: summaryLength,
             language: language,
-            manualContent: manualContent
+            manualContent: manualContent || null // Modifica qui
         }),
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Errore nella risposta del server');
+        }
+        return response.json();
+    })
     .then(data => {
         // Rimuovi l'icona di attesa
         document.body.removeChild(loadingIcon);
@@ -288,14 +293,16 @@ function addAndSummarizeLink(url, summaryLength, language, manualContent) {
         document.getElementById('addLinkModal').style.display = 'none';
         document.getElementById('addLinkForm').reset();
 
-        // Aggiorna la pagina per mostrare il nuovo link
-        location.reload();
+        // Aggiorna la lista dei link invece di ricaricare la pagina
+        fetchLinks();
     })
     .catch(error => {
         console.error('Errore nell\'aggiunta del link e generazione del riassunto:', error);
         // Rimuovi l'icona di attesa anche in caso di errore
         document.body.removeChild(loadingIcon);
-        alert('Si è verificato un errore durante l\'aggiunta del link. Riprova più tardi.');
+        alert('Si è verificato un errore durante l\'aggiunta del link. Il link potrebbe essere stato aggiunto, ma si è verificato un problema durante la generazione del riassunto. Riprova più tardi o controlla la lista dei link.');
+        // Aggiorna comunque la lista dei link
+        fetchLinks();
     });
 }
 

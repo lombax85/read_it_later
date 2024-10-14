@@ -68,27 +68,35 @@ $app->post('/api/add-and-summarize', function ($request, $response) {
 
     // Estrai il contenuto
     $extractor = new ContentExtractor();
-    $content = $manualContent ?: $extractor->extract($url);
+    $content = $manualContent ? ['content' => $manualContent, 'title' => 'Titolo non disponibile'] : $extractor->extract($url);
 
     if ($content) {
-        // Genera il riassunto
-        $generator = new SummaryGenerator();
-        $summary = $generator->generate($content, $summaryLength, $language);
+        try {
+            // Genera il riassunto
+            $generator = new SummaryGenerator();
+            $summary = $generator->generate($content['content'], $summaryLength, $language);
 
-        // Categorizza il link
-        $categorizer = new LinkCategorizer();
-        $category = $categorizer->categorize($url);
+            // Categorizza il link
+            $categorizer = new LinkCategorizer();
+            $category = $categorizer->categorize($url);
 
-        // Salva il link
-        $link = new Link($url, $content['title'] ?? 'Titolo non disponibile', $category);
-        $link->setSummary($summary);
-        $link->setContent($manualContent ?: $content['content']);
-        $link->save();
+            // Salva il link
+            $link = new Link($url, $content['title'] ?? 'Titolo non disponibile', $category);
+            $link->setSummary($summary);
+            $link->setContent($content['content']);
+            $link->save();
 
-        return $response->withJson([
-            'link' => $link,
-            'summary' => $summary
-        ], 201);
+            return $response->withJson([
+                'link' => $link,
+                'summary' => $summary
+            ], 201);
+        } catch (Exception $e) {
+            // Log dell'errore
+            error_log('Errore durante la generazione del riassunto o il salvataggio del link: ' . $e->getMessage());
+            
+            // Restituisci una risposta di errore
+            return $response->withStatus(500)->withJson(['error' => 'Si è verificato un errore durante l\'elaborazione del link']);
+        }
     } else {
         return $response->withStatus(400)->withJson(['error' => 'Impossibile estrarre il contenuto']);
     }
