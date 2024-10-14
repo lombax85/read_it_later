@@ -124,9 +124,11 @@ h1 del + span {
 }
 
 .accordion-header {
-    background-color: #f7f7f7;
+    background-color: #f1f3f5;
     padding: 10px 15px;
     cursor: pointer;
+    border: 1px solid #e9ecef;
+    border-radius: 4px 4px 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -139,10 +141,11 @@ h1 del + span {
 }
 
 .accordion-content {
-    padding: 0 15px;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.5s ease-out;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 0 0 4px 4px;
+    border: 1px solid #e9ecef;
+    border-top: none;
 }
 
 .accordion-content p {
@@ -583,4 +586,24 @@ audio::-webkit-media-controls-time-remaining-display {
 
 #generatePodcastForm button[type="submit"]:hover {
     background-color: #45a049;
+}
+
+.manual-content-textarea {
+    width: calc(100% - 20px); /* Sottraiamo il padding totale */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: vertical;
+    min-height: 150px;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box; /* Aggiungiamo questa proprietà */
+}
+
+.manual-content-textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }

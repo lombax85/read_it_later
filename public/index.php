@@ -64,23 +64,25 @@ $app->post('/api/add-and-summarize', function ($request, $response) {
     $url = $data['url'];
     $summaryLength = $data['summaryLength'] ?? 'medio';
     $language = $data['language'] ?? 'italiano';
+    $manualContent = $data['manualContent'] ?? null;
 
     // Estrai il contenuto
     $extractor = new ContentExtractor();
-    $content = $extractor->extract($url);
+    $content = $manualContent ?: $extractor->extract($url);
 
     if ($content) {
         // Genera il riassunto
         $generator = new SummaryGenerator();
-        $summary = $generator->generate($content['content'], $summaryLength, $language);
+        $summary = $generator->generate($content, $summaryLength, $language);
 
         // Categorizza il link
         $categorizer = new LinkCategorizer();
         $category = $categorizer->categorize($url);
 
         // Salva il link
-        $link = new Link($url, $content['title'], $category);
+        $link = new Link($url, $content['title'] ?? 'Titolo non disponibile', $category);
         $link->setSummary($summary);
+        $link->setContent($manualContent ?: $content['content']);
         $link->save();
 
         return $response->withJson([

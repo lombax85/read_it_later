@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchPodcasts();
     handleResize();
     changePodcast();
+    initializeAccordion(); // Aggiungi questa chiamata
 });
 
 let selectedLinks = [];
@@ -228,16 +229,38 @@ function showAddLinkModal() {
     }
 }
 
+function toggleContentAccordion() {
+    const accordion = document.getElementById('manualContentAccordion');
+    const header = accordion.previousElementSibling;
+    const icon = header.querySelector('.accordion-icon');
+    if (accordion.style.display === 'block') {
+        accordion.style.display = 'none';
+        icon.textContent = '▼';
+        header.classList.remove('active');
+    } else {
+        accordion.style.display = 'block';
+        icon.textContent = '▲';
+        header.classList.add('active');
+    }
+}
+
+// Aggiungi questa funzione per inizializzare l'accordion chiuso
+function initializeAccordion() {
+    const accordion = document.getElementById('manualContentAccordion');
+    accordion.style.display = 'none';
+}
+
 document.getElementById('addLinkForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const url = document.getElementById('url').value;
     const summaryLength = document.getElementById('summaryLength').value;
     const language = document.getElementById('language').value;
+    const manualContent = document.getElementById('manualContent').value;
 
-    addAndSummarizeLink(url, summaryLength, language);
+    addAndSummarizeLink(url, summaryLength, language, manualContent);
 });
 
-function addAndSummarizeLink(url, summaryLength, language) {
+function addAndSummarizeLink(url, summaryLength, language, manualContent) {
     // Mostra l'icona di attesa
     const loadingIcon = document.createElement('div');
     loadingIcon.id = 'loadingIcon';
@@ -252,7 +275,8 @@ function addAndSummarizeLink(url, summaryLength, language) {
         body: JSON.stringify({ 
             url: url,
             summaryLength: summaryLength,
-            language: language
+            language: language,
+            manualContent: manualContent
         }),
     })
     .then(response => response.json())

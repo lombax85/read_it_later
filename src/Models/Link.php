@@ -13,6 +13,7 @@ class Link implements JsonSerializable {
     private $category;
     private $summary;
     private $createdAt;
+    private $content;
 
     public function __construct($url = null, $title = null, $category = null) {
         $this->url = $url;
@@ -35,10 +36,13 @@ class Link implements JsonSerializable {
     public function setTitle($title) { $this->title = $title; }
     public function setCategory($category) { $this->category = $category; }
 
+    public function getContent() { return $this->content; }
+    public function setContent($content) { $this->content = $content; }
+
     public function save() {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("INSERT INTO links (url, title, category, summary, created_at) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$this->url, $this->title, $this->category, $this->summary, $this->createdAt]);
+        $stmt = $db->prepare("INSERT INTO links (url, title, category, summary, content, created_at) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$this->url, $this->title, $this->category, $this->summary, $this->content, $this->createdAt]);
         $this->id = $db->lastInsertId();
     }
 
@@ -112,6 +116,7 @@ class Link implements JsonSerializable {
             'title' => $this->title,
             'category' => $this->category,
             'summary' => $this->summary,
+            'content' => $this->content,
             'createdAt' => $this->createdAt
         ];
     }

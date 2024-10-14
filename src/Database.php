@@ -56,22 +56,24 @@ class Database
                 url TEXT NOT NULL,
                 title TEXT NOT NULL,
                 category TEXT NOT NULL,
+                summary TEXT,
+                content TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ");
 
-        // Aggiungiamo la colonna summary se non esiste già
+        // Aggiungiamo la colonna content se non esiste già
         $result = $this->connection->query("PRAGMA table_info(links)");
         $columns = $result->fetchAll(PDO::FETCH_ASSOC);
-        $summaryExists = false;
+        $contentExists = false;
         foreach ($columns as $column) {
-            if ($column['name'] === 'summary') {
-                $summaryExists = true;
+            if ($column['name'] === 'content') {
+                $contentExists = true;
                 break;
             }
         }
-        if (!$summaryExists) {
-            $this->connection->exec("ALTER TABLE links ADD COLUMN summary TEXT");
+        if (!$contentExists) {
+            $this->connection->exec("ALTER TABLE links ADD COLUMN content TEXT");
         }
     }
 }
