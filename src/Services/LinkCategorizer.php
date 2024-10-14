@@ -16,7 +16,11 @@ class LinkCategorizer {
             throw new \Exception('OPENAI_API_KEY non è stata impostata');
         }
         $this->openaiClient = OpenAI::client($apiKey);
-        $this->httpClient = new Client();
+        $this->httpClient = new Client([
+            'headers' => [
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            ]
+        ]);
     }
 
     public function categorize($url) {
