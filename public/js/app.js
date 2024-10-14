@@ -40,6 +40,11 @@ function createLinkElement(link) {
     if (link.isRead) {
         div.classList.add('read');
     }
+    
+    // Formatta la data
+    const createdAt = new Date(link.createdAt);
+    const formattedDate = `${createdAt.getDate().toString().padStart(2, '0')}/${(createdAt.getMonth() + 1).toString().padStart(2, '0')}/${createdAt.getFullYear()} ${createdAt.getHours().toString().padStart(2, '0')}:${createdAt.getMinutes().toString().padStart(2, '0')}`;
+
     div.innerHTML = `
         <div class="link-header">
             <label class="link-checkbox">
@@ -49,6 +54,7 @@ function createLinkElement(link) {
             <h3>${link.title || 'Titolo non disponibile'}</h3>
         </div>
         <p>${link.category || 'Categoria non disponibile'}</p>
+        <p class="link-date">Aggiunto il: ${formattedDate}</p>
         <a href="${link.url || '#'}" target="_blank">${link.url ? 'Visita il link' : 'URL non disponibile'}</a>
         <div class="link-actions">
             <button onclick="generateOrShowSummary(${link.id}, '${link.url || ''}', ${link.isRead})">
