@@ -58,7 +58,8 @@ class Database
                 category TEXT NOT NULL,
                 summary TEXT,
                 content TEXT,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                is_read INTEGER DEFAULT 0
             )
         ");
 
@@ -74,6 +75,20 @@ class Database
         }
         if (!$contentExists) {
             $this->connection->exec("ALTER TABLE links ADD COLUMN content TEXT");
+        }
+
+        // Aggiungiamo la colonna is_read se non esiste già
+        $result = $this->connection->query("PRAGMA table_info(links)");
+        $columns = $result->fetchAll(PDO::FETCH_ASSOC);
+        $isReadExists = false;
+        foreach ($columns as $column) {
+            if ($column['name'] === 'is_read') {
+                $isReadExists = true;
+                break;
+            }
+        }
+        if (!$isReadExists) {
+            $this->connection->exec("ALTER TABLE links ADD COLUMN is_read INTEGER DEFAULT 0");
         }
     }
 }

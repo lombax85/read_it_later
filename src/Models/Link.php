@@ -14,13 +14,15 @@ class Link implements JsonSerializable {
     private $summary;
     private $createdAt;
     private $content;
+    private $isRead;
 
-    public function __construct($url = null, $title = null, $category = null, $content = null) {
+    public function __construct($url = null, $title = null, $category = null, $content = null, $isRead = false) {
         $this->url = $url;
         $this->title = $title;
         $this->category = $category;
         $this->content = $content;
         $this->createdAt = date('Y-m-d H:i:s');
+        $this->isRead = $isRead;
     }
 
     // Getter e setter
@@ -40,19 +42,25 @@ class Link implements JsonSerializable {
     public function getContent() { return $this->content; }
     public function setContent($content) { $this->content = $content; }
 
+    public function isRead() { return $this->isRead; }
+    public function setRead($isRead) { $this->isRead = $isRead; }
+
     public function save() {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("INSERT INTO links (url, title, category, summary, content, created_at) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$this->url, $this->title, $this->category, $this->summary, $this->content, $this->createdAt]);
-        $this->id = $db->lastInsertId();
+        if ($this->id) {
+            $stmt = $db->prepare("UPDATE links SET url = ?, title = ?, category = ?, summary = ?, content = ?, is_read = ? WHERE id = ?");
+            $stmt->execute([$this->url, $this->title, $this->category, $this->summary, $this->content, $this->isRead ? 1 : 0, $this->id]);
+        } else {
+            $stmt = $db->prepare("INSERT INTO links (url, title, category, summary, content, created_at, is_read) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$this->url, $this->title, $this->category, $this->summary, $this->content, $this->createdAt, $this->isRead ? 1 : 0]);
+            $this->id = $db->lastInsertId();
+        }
     }
 
     public static function getAll() {
         $db = Database::getInstance()->getConnection();
         $stmt = $db->query("SELECT * FROM links ORDER BY created_at DESC");
         $links = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        error_log('Links from database: ' . print_r($links, true));
         
         $linkObjects = [];
         foreach ($links as $link) {
@@ -61,6 +69,7 @@ class Link implements JsonSerializable {
             $linkObject->summary = $link['summary'];
             $linkObject->createdAt = $link['created_at'];
             $linkObject->content = $link['content'];
+            $linkObject->isRead = $link['is_read'];
             $linkObjects[] = $linkObject;
         }
         
@@ -77,11 +86,12 @@ class Link implements JsonSerializable {
         
         $linkObjects = [];
         foreach ($links as $link) {
-            $linkObject = new self($link['url'], $link['title'], $link['category'], $link['content']);
+            $linkObject = new self($link['url'], $link['title'], $link['category'], $link['content'], $link['is_read']);
             $linkObject->id = $link['id'];
             $linkObject->summary = $link['summary'];
             $linkObject->createdAt = $link['created_at'];
             $linkObject->content = $link['content'];
+            $linkObject->isRead = $link['is_read'];
             $linkObjects[] = $linkObject;
         }
         
@@ -107,6 +117,7 @@ class Link implements JsonSerializable {
             $linkObject->summary = $link['summary'];
             $linkObject->createdAt = $link['created_at'];
             $linkObject->content = $link['content'];
+            $linkObject->isRead = $link['is_read'];
             return $linkObject;
         }
         
@@ -121,7 +132,8 @@ class Link implements JsonSerializable {
             'category' => $this->category,
             'summary' => $this->summary,
             'content' => $this->content,
-            'createdAt' => $this->createdAt
+            'createdAt' => $this->createdAt,
+            'isRead' => $this->isRead
         ];
     }
 
@@ -131,3 +143,4 @@ class Link implements JsonSerializable {
         $stmt->execute([$this->id]);
     }
 }
+

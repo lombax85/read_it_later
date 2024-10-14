@@ -13,13 +13,21 @@ function fetchLinks() {
         .then(response => response.json())
         .then(links => {
             console.log('Links received from backend:', links);
-            const linkList = document.getElementById('link-list');
-            linkList.innerHTML = '';
+            const unreadLinkList = document.getElementById('unread-link-list');
+            const readLinkList = document.getElementById('read-link-list');
+            unreadLinkList.innerHTML = '';
+            readLinkList.innerHTML = '';
+            
             links.forEach(link => {
                 const linkElement = createLinkElement(link);
-                linkList.appendChild(linkElement);
+                if (link.isRead) {
+                    readLinkList.appendChild(linkElement);
+                } else {
+                    unreadLinkList.appendChild(linkElement);
+                }
             });
-            updateGeneratePodcastButton(); // Assicurati che questa riga sia presente
+            updateGeneratePodcastButton();
+            initializeReadLinksAccordion();
         })
         .catch(error => console.error('Errore nel recupero dei link:', error));
 }
@@ -28,6 +36,10 @@ function createLinkElement(link) {
     console.log('Creating element for link:', link);
     const div = document.createElement('div');
     div.className = 'link-item';
+    div.dataset.id = link.id;
+    if (link.isRead) {
+        div.classList.add('read');
+    }
     div.innerHTML = `
         <div class="link-header">
             <label class="link-checkbox">
@@ -39,7 +51,7 @@ function createLinkElement(link) {
         <p>${link.category || 'Categoria non disponibile'}</p>
         <a href="${link.url || '#'}" target="_blank">${link.url ? 'Visita il link' : 'URL non disponibile'}</a>
         <div class="link-actions">
-            <button onclick="generateOrShowSummary(${link.id}, '${link.url || ''}')">
+            <button onclick="generateOrShowSummary(${link.id}, '${link.url || ''}', ${link.isRead})">
                 ${link.summary ? 'Mostra Riassunto' : 'Genera Riassunto'}
             </button>
             <button onclick="deleteLink(${link.id})">Elimina</button>
@@ -140,13 +152,16 @@ function changePodcast() {
     }
 }
 
-function generateOrShowSummary(id, url) {
+function generateOrShowSummary(id, url, isRead) {
     if (url) {
         fetch(`./api/summary/${id}`)
         .then(response => response.json())
         .then(data => {
             if (data.summary) {
                 showSummaryInAccordion(id, data.summary);
+                if (!isRead) {
+                    markLinkAsRead(id);
+                }
             } else {
                 generateAndSaveSummary(id, url);
             }
@@ -158,6 +173,17 @@ function generateOrShowSummary(id, url) {
     } else {
         console.error('URL non disponibile per il link con ID:', id);
     }
+}
+
+function markLinkAsRead(id) {
+    fetch(`./api/links/${id}/read`, {
+        method: 'POST',
+    })
+    .then(response => response.json())
+    .then(() => {
+        // Non facciamo nulla qui, il cambiamento visivo avverrà al refresh
+    })
+    .catch(error => console.error('Errore nella marcatura del link come letto:', error));
 }
 
 function showSummaryInAccordion(id, summary) {
@@ -176,12 +202,10 @@ function showSummaryInAccordion(id, summary) {
         </div>
     `;
 
-    // Apri l'accordion dopo un breve ritardo
-    setTimeout(() => {
-        const content = accordionItem.querySelector('.accordion-content');
-        accordionItem.classList.add('active');
-        content.style.maxHeight = content.scrollHeight + 'px';
-    }, 100);
+    // Apri l'accordion immediatamente
+    const content = accordionItem.querySelector('.accordion-content');
+    accordionItem.classList.add('active');
+    content.style.maxHeight = content.scrollHeight + 'px';
 }
 
 function toggleAccordion(id) {
@@ -208,7 +232,7 @@ function generateAndSaveSummary(id, url) {
     .then(response => response.json())
     .then(data => {
         showSummaryInAccordion(id, data.summary);
-        fetchLinks(); // Aggiorna la lista dei link per riflettere il nuovo stato
+        markLinkAsRead(id);
     })
     .catch(error => console.error('Errore nella generazione del riassunto:', error));
 }
@@ -248,6 +272,22 @@ function toggleContentAccordion() {
 function initializeAccordion() {
     const accordion = document.getElementById('manualContentAccordion');
     accordion.style.display = 'none';
+}
+
+function initializeReadLinksAccordion() {
+    const readLinksSection = document.getElementById('read-links-section');
+    const readLinksToggle = document.getElementById('read-links-toggle');
+    const readLinkList = document.getElementById('read-link-list');
+
+    readLinksToggle.addEventListener('click', () => {
+        if (readLinkList.style.display === 'none') {
+            readLinkList.style.display = 'block';
+            readLinksToggle.textContent = 'Nascondi link letti';
+        } else {
+            readLinkList.style.display = 'none';
+            readLinksToggle.textContent = 'Mostra link letti';
+        }
+    });
 }
 
 document.getElementById('addLinkForm').addEventListener('submit', function(e) {

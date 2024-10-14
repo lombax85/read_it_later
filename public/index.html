@@ -9,6 +9,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <!-- Aggiungiamo la libreria marked per il parsing del markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .link-item.read {
+            opacity: 0.7;
+            background-color: #f0f0f0;
+        }
+        #read-links-toggle {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
     <!-- Sposta questo div fuori dal div #app e prima di esso -->
@@ -41,6 +60,14 @@
         </div>
 
         <div id="link-list"></div>
+        
+        <div id="unread-link-list"></div>
+        
+        <div id="read-links-section">
+            <h2>Link letti</h2>
+            <button id="read-links-toggle">Mostra link letti</button>
+            <div id="read-link-list" style="display: none;"></div>
+        </div>
     </div>
 
     <!-- Modale per l'aggiunta di link (esistente) -->
