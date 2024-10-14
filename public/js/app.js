@@ -72,9 +72,11 @@ function createLinkElement(link) {
             </label>
             <h3>${link.title || 'Titolo non disponibile'}</h3>
         </div>
-        <p>${link.category || 'Categoria non disponibile'}</p>
-        <p class="link-date">Aggiunto il: ${formattedDate}</p>
-        <a href="${link.url || '#'}" target="_blank">${link.url ? 'Visita il link' : 'URL non disponibile'}</a>
+        <div class="link-info">
+            <span class="link-category">${link.category || 'Categoria non disponibile'}</span>
+            <span class="link-date">Aggiunto il: ${formattedDate}</span>
+            <a href="${link.url || '#'}" target="_blank" class="link-url">${link.url ? 'Visita il link' : 'URL non disponibile'}</a>
+        </div>
         <div class="link-actions">
             <button onclick="generateOrShowSummary(${link.id}, '${link.url || ''}', ${link.isRead})">
                 ${link.summary ? 'Mostra Riassunto' : 'Genera Riassunto'}
