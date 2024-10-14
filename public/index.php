@@ -188,5 +188,18 @@ $app->post('/api/links/{id}/read', function ($request, $response, $args) {
     }
 });
 
+$app->post('/api/links/{id}/unread', function ($request, $response, $args) {
+    $id = $args['id'];
+    $link = Link::getById($id);
+    
+    if ($link) {
+        $link->setRead(false);
+        $link->save();
+        return $response->withJson(['success' => true]);
+    } else {
+        return $response->withStatus(404)->withJson(['error' => 'Link non trovato']);
+    }
+});
+
 // Esecuzione dell'applicazione
 $app->run();

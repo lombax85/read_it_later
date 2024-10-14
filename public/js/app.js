@@ -54,6 +54,7 @@ function createLinkElement(link) {
             <button onclick="generateOrShowSummary(${link.id}, '${link.url || ''}', ${link.isRead})">
                 ${link.summary ? 'Mostra Riassunto' : 'Genera Riassunto'}
             </button>
+            ${link.isRead ? `<button onclick="markLinkAsUnread(${link.id})">Segna come non letto</button>` : ''}
             <button onclick="deleteLink(${link.id})">Elimina</button>
         </div>
         <div id="accordion-item-${link.id}" class="accordion-item"></div>
@@ -474,3 +475,15 @@ function handleResize() {
 
 // Aggiungi questi listener
 window.addEventListener('resize', handleResize);
+
+function markLinkAsUnread(id) {
+    fetch(`./api/links/${id}/unread`, {
+        method: 'POST',
+    })
+    .then(response => response.json())
+    .then(() => {
+        // Aggiorniamo la lista dei link per riflettere il cambiamento
+        fetchLinks();
+    })
+    .catch(error => console.error('Errore nella marcatura del link come non letto:', error));
+}
