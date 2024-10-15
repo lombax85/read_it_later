@@ -50,6 +50,7 @@ class Database
 
     private function runMigrations()
     {
+        // Migrazione per la tabella links
         $this->connection->exec("
             CREATE TABLE IF NOT EXISTS links (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,6 +61,16 @@ class Database
                 content TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 is_read INTEGER DEFAULT 0
+            )
+        ");
+
+        // Migrazione per la tabella podcasts
+        $this->connection->exec("
+            CREATE TABLE IF NOT EXISTS podcasts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                filename TEXT NOT NULL,
+                title TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ");
 
@@ -78,8 +89,6 @@ class Database
         }
 
         // Aggiungiamo la colonna is_read se non esiste già
-        $result = $this->connection->query("PRAGMA table_info(links)");
-        $columns = $result->fetchAll(PDO::FETCH_ASSOC);
         $isReadExists = false;
         foreach ($columns as $column) {
             if ($column['name'] === 'is_read') {

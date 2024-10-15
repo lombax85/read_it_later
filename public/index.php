@@ -23,6 +23,7 @@ use App\Services\ContentExtractor;
 use App\Services\SummaryGenerator;
 use App\Services\LinkCategorizer;
 use App\Services\PodcastGenerator;
+use App\Models\Podcast;
 
 // Inizializzazione dell'applicazione
 $app = new App();
@@ -140,26 +141,34 @@ $app->delete('/api/links/{id}', function ($request, $response, $args) {
     }
 });
 
+// Modifica la route per la generazione del podcast
 $app->post('/api/generate-podcast', function ($request, $response) {
     $data = $request->getParsedBody();
     $linkIds = array_column($data['links'], 'id');
-    $length = $data['length'] ?? 'medio';  // Aggiungiamo il parametro length
-    $language = $data['language'] ?? 'italiano';  // Aggiungiamo il parametro language
+    $length = $data['length'] ?? 'medio';
+    $language = $data['language'] ?? 'italiano';
 
     $podcastGenerator = new PodcastGenerator();
-    $podcastUrl = $podcastGenerator->generate($linkIds, $length, $language);
+    $result = $podcastGenerator->generate($linkIds, $length, $language);
 
-    return $response->withJson(['podcastUrl' => $podcastUrl]);
+    return $response->withJson([
+        'podcastUrl' => $result['audioFile'],
+        'podcastTitle' => $result['title']
+    ]);
 });
 
+// Modifica la route per ottenere la lista dei podcast
 $app->get('/api/podcasts', function ($request, $response) {
-    $podcastDir = __DIR__ . '/podcasts';
-    $podcasts = glob($podcastDir . '/*.mp3');
-    $podcastUrls = array_map(function ($path) {
-        return '/podcasts/' . basename($path);
+    $podcasts = Podcast::getAll();
+    $podcastInfo = array_map(function ($podcast) {
+        return [
+            'url' => $podcast['filename'],
+            'date' => $podcast['created_at'],
+            'title' => $podcast['title']
+        ];
     }, $podcasts);
 
-    return $response->withJson($podcastUrls);
+    return $response->withJson($podcastInfo);
 });
 
 // Aggiungi questa nuova route dopo le altre route esistenti
@@ -167,7 +176,10 @@ $app->delete('/api/podcasts/{filename}', function ($request, $response, $args) {
     $filename = $args['filename'];
     $podcastPath = __DIR__ . '/podcasts/' . $filename;
 
+    error_log("Podcast path: " . $podcastPath);
+
     if (file_exists($podcastPath)) {
+        Podcast::delete('/podcasts/' .$filename);
         unlink($podcastPath);
         return $response->withStatus(204);
     } else {

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use OpenAI;
 use App\Models\Link;
+use App\Models\Podcast;
 
 class PodcastGenerator {
     private $openaiClient;
@@ -21,8 +22,13 @@ class PodcastGenerator {
     public function generate($linkIds, $length = 'medio', $language = 'italiano') {
         $contents = $this->getContents($linkIds);
         $script = $this->generateScript($contents, $length, $language);
+        $title = $this->generateTitle($contents);
         $audioFile = $this->generateAudio($script, $language);
-        return $audioFile;
+
+        $podcast = new Podcast($audioFile, $title);
+        $podcast->save();
+
+        return ['audioFile' => $audioFile, 'title' => $title];
     }
 
     private function getContents($linkIds) {
@@ -75,6 +81,22 @@ class PodcastGenerator {
 
     private function getLanguagePrompt($language) {
         return "Genera lo script in $language.";
+    }
+
+    private function generateTitle($contents) {
+        $combinedContent = implode("\n\n", array_slice($contents, 0, 3)); // Usiamo solo i primi 3 contenuti per brevità
+
+        $response = $this->openaiClient->chat()->create([
+            'model' => 'gpt-4o-mini',
+            'messages' => [
+                ['role' => 'system', 'content' => 'Sei un assistente che genera titoli brevi e accattivanti. Genera un titolo di massimo 5 parole che riassuma il tema principale dei contenuti forniti.'],
+                ['role' => 'user', 'content' => $combinedContent],
+            ],
+            'max_tokens' => 20,
+            'temperature' => 0.7,
+        ]);
+
+        return trim($response->choices[0]->message->content);
     }
 
     private function generateAudio($script, $language) {

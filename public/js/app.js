@@ -415,14 +415,15 @@ function updatePodcastList(podcasts) {
         podcastSelect.innerHTML = '<option value="">Seleziona un podcast</option>';
         podcasts.forEach((podcast, index) => {
             const option = document.createElement('option');
-            option.value = podcast;
-            const date = new Date(podcast.match(/podcast_(\d+)\.mp3/)[1] * 1000);
-            option.textContent = `Podcast del ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+            option.value = podcast.url;
+            const date = new Date(podcast.date);
+            const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+            option.textContent = `${podcast.title} - ${formattedDate}`;
             podcastSelect.appendChild(option);
         });
         
         // Seleziona l'ultimo podcast di default
-        podcastSelect.value = podcasts[podcasts.length - 1];
+        podcastSelect.value = podcasts[podcasts.length - 1].url;
         audioPlayer.src = podcastSelect.value;
 
         // Aggiungi il pulsante di eliminazione
