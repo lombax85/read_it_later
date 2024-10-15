@@ -24,6 +24,7 @@ use App\Services\SummaryGenerator;
 use App\Services\LinkCategorizer;
 use App\Services\PodcastGenerator;
 use App\Models\Podcast;
+use App\Services\ChatService;
 
 // Inizializzazione dell'applicazione
 $app = new App();
@@ -211,6 +212,24 @@ $app->post('/api/links/{id}/unread', function ($request, $response, $args) {
     } else {
         return $response->withStatus(404)->withJson(['error' => 'Link non trovato']);
     }
+});
+
+// Aggiungi questa nuova route dopo le altre route esistenti
+$app->post('/api/chat', function ($request, $response) {
+    $data = $request->getParsedBody();
+    $linkId = $data['linkId'];
+    $message = $data['message'];
+    $history = $data['history'];
+
+    $link = Link::getById($linkId);
+    if (!$link) {
+        return $response->withStatus(404)->withJson(['error' => 'Link non trovato']);
+    }
+
+    $chatService = new ChatService();
+    $reply = $chatService->generateReply($link->getContent(), $message, $history);
+
+    return $response->withJson(['reply' => $reply]);
 });
 
 // Esecuzione dell'applicazione

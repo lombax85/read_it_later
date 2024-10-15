@@ -9,10 +9,16 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.addEventListener('input', function() {
         filterLinks(this.value);
     });
+
+    const chatForm = document.getElementById('chatForm');
+    chatForm.addEventListener('submit', handleChatSubmit);
 });
 
 let selectedLinks = [];
 let allLinks = [];
+let currentChatLinkId = null;
+let chatHistory = [];
+let chatMemory = {};
 
 function fetchLinks() {
     fetch('./api/links')
@@ -83,6 +89,7 @@ function createLinkElement(link) {
             </button>
             ${link.isRead ? `<button onclick="markLinkAsUnread(${link.id})">Segna come non letto</button>` : ''}
             <button onclick="deleteLink(${link.id})">Elimina</button>
+            <button onclick="openChatModal(${link.id})">Chatta con l'articolo</button>
         </div>
         <div id="accordion-item-${link.id}" class="accordion-item"></div>
     `;
@@ -514,4 +521,92 @@ function markLinkAsUnread(id) {
         fetchLinks();
     })
     .catch(error => console.error('Errore nella marcatura del link come non letto:', error));
+}
+
+// Aggiungi questa funzione per aprire la modale di chat
+function openChatModal(linkId) {
+    currentChatLinkId = linkId;
+    if (!chatMemory[linkId]) {
+        chatMemory[linkId] = [];
+    }
+    const modal = document.getElementById('chatModal');
+    modal.style.display = 'block';
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.innerHTML = '';
+    
+    // Popola la chat con i messaggi memorizzati
+    chatMemory[linkId].forEach(message => {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chat-message', `${message.sender}-message`);
+        messageElement.textContent = message.content;
+        chatMessages.appendChild(messageElement);
+    });
+
+    // Scorri alla fine della chat
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    const closeBtn = modal.querySelector('.close');
+    closeBtn.onclick = function() {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+}
+
+// Aggiungi questa funzione per gestire l'invio dei messaggi
+function handleChatSubmit(event) {
+    event.preventDefault();
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    if (message) {
+        addMessageToChat('user', message);
+        sendChatMessage(message);
+        input.value = '';
+    }
+}
+
+// Funzione per aggiungere un messaggio alla chat
+function addMessageToChat(sender, message) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('chat-message', `${sender}-message`);
+    messageElement.textContent = message;
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Aggiungi il messaggio alla memoria della chat solo se non esiste già
+    if (currentChatLinkId) {
+        const lastMessage = chatMemory[currentChatLinkId][chatMemory[currentChatLinkId].length - 1];
+        if (!lastMessage || lastMessage.content !== message) {
+            chatMemory[currentChatLinkId].push({ sender, content: message });
+        }
+    }
+}
+
+// Funzione per inviare un messaggio al server
+function sendChatMessage(message) {
+    fetch('./api/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            linkId: currentChatLinkId,
+            message: message,
+            history: chatMemory[currentChatLinkId].map(msg => ({
+                role: msg.sender === 'user' ? 'user' : 'assistant',
+                content: msg.content
+            }))
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        addMessageToChat('ai', data.reply);
+        // Non aggiungiamo più il messaggio alla memoria qui, lo fa già addMessageToChat
+    })
+    .catch(error => console.error('Errore nell\'invio del messaggio:', error));
 }

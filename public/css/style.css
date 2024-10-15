@@ -831,3 +831,49 @@ button,
     -webkit-tap-highlight-color: transparent;
     user-select: none;
 }
+
+/* Aggiungi questi stili alla fine del file CSS */
+
+#chatMessages {
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.chat-message {
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.user-message {
+    background-color: #e6f2ff;
+    text-align: right;
+}
+
+.ai-message {
+    background-color: #f0f0f0;
+}
+
+#chatForm {
+    display: flex;
+}
+
+#chatInput {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+#chatForm button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+#chatForm button:hover {
+    background-color: #45a049;
+}
