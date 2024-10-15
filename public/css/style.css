@@ -757,3 +757,77 @@ audio::-webkit-media-controls-time-remaining-display {
         width: 100%;
     }
 }
+
+/* Aggiungi questi stili alla fine del file CSS esistente */
+
+/* Stili per prevenire lo zoom su input e textarea su dispositivi mobili */
+@media screen and (max-width: 768px) {
+    input[type="text"],
+    input[type="url"],
+    input[type="email"],
+    input[type="password"],
+    textarea {
+        font-size: 16px; /* Previene lo zoom automatico su iOS */
+    }
+
+    select {
+        font-size: 16px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        padding-right: 20px; /* Spazio per l'icona della freccia */
+        background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+        background-repeat: no-repeat;
+        background-position-x: 100%;
+        background-position-y: 5px;
+    }
+
+    /* Migliora la leggibilità e l'interazione con i pulsanti su mobile */
+    button {
+        padding: 12px 20px;
+        font-size: 16px;
+    }
+
+    /* Aumenta la dimensione dei checkbox per una migliore interazione su touch screen */
+    input[type="checkbox"] {
+        transform: scale(1.5);
+        margin-right: 10px;
+    }
+
+    /* Migliora la spaziatura per gli elementi della lista dei link su mobile */
+    .link-item {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    /* Adatta il layout della modale per schermi più piccoli */
+    .modal-content {
+        width: 90%;
+        padding: 15px;
+    }
+
+    /* Migliora la leggibilità del testo su schermi più piccoli */
+    body {
+        font-size: 16px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+}
+
+/* Stile per evitare la selezione del testo su elementi interattivi */
+button, 
+.link-checkbox, 
+.accordion-header {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
