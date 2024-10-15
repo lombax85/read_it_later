@@ -232,6 +232,8 @@ h1 del + span {
     border: 1px solid #888;
     width: 80%;
     max-width: 500px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .close {
@@ -876,4 +878,65 @@ button,
 
 #chatForm button:hover {
     background-color: #45a049;
+}
+
+/* Modifica gli stili esistenti per la modale */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Aggiungi questi stili per il form di generazione del podcast */
+#generatePodcastForm {
+    display: flex;
+    flex-direction: column;
+}
+
+#generatePodcastForm label {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+#generatePodcastForm select {
+    margin-bottom: 15px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+#generatePodcastForm button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#generatePodcastForm button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Stili responsivi per la modale */
+@media screen and (max-width: 600px) {
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        padding: 15px;
+    }
+
+    #generatePodcastForm select,
+    #generatePodcastForm button[type="submit"] {
+        width: 100%;
+    }
 }
