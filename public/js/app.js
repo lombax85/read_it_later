@@ -1,28 +1,4 @@
-// Polyfill per browser più vecchi
-if (navigator.mediaDevices === undefined) {
-    navigator.mediaDevices = {};
-}
-
-if (navigator.mediaDevices.getUserMedia === undefined) {
-    navigator.mediaDevices.getUserMedia = function(constraints) {
-        var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-        if (!getUserMedia) {
-            return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
-        }
-
-        return new Promise(function(resolve, reject) {
-            getUserMedia.call(navigator, constraints, resolve, reject);
-        });
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function() {
-    if (!navigator.mediaDevices && !navigator.getUserMedia && !navigator.webkitGetUserMedia && !navigator.mozGetUserMedia) {
-        alert('Il tuo browser non supporta la registrazione audio. Per favore, prova con un browser più recente.');
-        document.getElementById('push-to-talk').style.display = 'none';
-    }
-
     fetchLinks();
     fetchPodcasts();
     handleResize();
@@ -688,19 +664,7 @@ function initializePushToTalk() {
         if (isRecording) return;
 
         try {
-            let stream;
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                console.log("Usando navigator.mediaDevices.getUserMedia");
-                stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            } else if (navigator.getUserMedia) {
-                console.log("Usando navigator.getUserMedia");
-                stream = await new Promise((resolve, reject) => {
-                    navigator.getUserMedia({ audio: true }, resolve, reject);
-                });
-            } else {
-                throw new Error('getUserMedia non è supportato in questo browser');
-            }
-
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             isRecording = true;
 
             if (!audioPlayer.paused) {
@@ -725,7 +689,7 @@ function initializePushToTalk() {
                 permissionModal.style.display = 'block';
                 errorMessage += '\nPermesso negato. Per favore, concedi l\'accesso al microfono nelle impostazioni del browser.';
             } else {
-                errorMessage += '\nSi è verificato un errore durante l\'accesso al microfono. Il tuo browser potrebbe non supportare questa funzionalità.';
+                errorMessage += '\nSi è verificato un errore durante l\'accesso al microfono. Riprova.';
             }
             alert(errorMessage);
             isRecording = false;
