@@ -633,20 +633,20 @@ function initializePushToTalk() {
     const audioPlayer = document.getElementById('audio-player');
     const waitingModal = document.getElementById('waiting-modal');
     let isRecording = false;
+    let mediaRecorder;
     let audioChunks = [];
 
-    // Aggiungi questi gestori di eventi touch
-    pushToTalkButton.addEventListener('touchstart', startRecording);
-    pushToTalkButton.addEventListener('touchend', stopRecording);
-    pushToTalkButton.addEventListener('touchcancel', stopRecording);
+    pushToTalkButton.addEventListener('click', toggleRecording);
 
-    // Mantieni anche i gestori di eventi del mouse per la compatibilità con i desktop
-    pushToTalkButton.addEventListener('mousedown', startRecording);
-    pushToTalkButton.addEventListener('mouseup', stopRecording);
-    pushToTalkButton.addEventListener('mouseleave', stopRecording);
+    function toggleRecording() {
+        if (isRecording) {
+            stopRecording();
+        } else {
+            startRecording();
+        }
+    }
 
-    async function startRecording(event) {
-        event.preventDefault(); // Previene il comportamento predefinito del touch
+    async function startRecording() {
         if (isRecording) return;
         isRecording = true;
 
@@ -655,7 +655,7 @@ function initializePushToTalk() {
         }
 
         pushToTalkButton.classList.add('recording');
-        pushToTalkButton.innerHTML = '<i class="fas fa-pause"></i>';
+        pushToTalkButton.innerHTML = 'Stop';
 
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -671,19 +671,18 @@ function initializePushToTalk() {
             console.error('Errore nell\'avvio della registrazione:', error);
             isRecording = false;
             pushToTalkButton.classList.remove('recording');
-            pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
+            pushToTalkButton.innerHTML = 'Registra';
         }
     }
 
-    function stopRecording(event) {
-        event.preventDefault(); // Previene il comportamento predefinito del touch
+    function stopRecording() {
         if (!isRecording) return;
         isRecording = false;
 
         if (mediaRecorder && mediaRecorder.state === 'recording') {
             mediaRecorder.stop();
             pushToTalkButton.classList.remove('recording');
-            pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
+            pushToTalkButton.innerHTML = 'Registra';
 
             waitingModal.style.display = 'block';
 

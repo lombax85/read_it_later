@@ -438,23 +438,24 @@ h1 del + span {
 }
 
 .push-to-talk-button {
-    width: 60px;
-    height: 60px;
-    flex-shrink: 0;
-    border-radius: 50%;
+    width: auto;
+    height: auto;
+    padding: 10px 20px;
+    border-radius: 5px;
     background-color: #4CAF50;
     border: none;
     color: white;
-    font-size: 24px;
+    font-size: 16px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     transition: background-color 0.3s;
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
+}
+
+.push-to-talk-button:hover {
+    background-color: #45a049;
+}
+
+.push-to-talk-button.recording {
+    background-color: #ff4d4d;
 }
 
 /* Stile personalizzato per il player audio */
