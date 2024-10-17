@@ -695,26 +695,40 @@ function initializePushToTalk() {
         const selectedPodcastId = podcastSelect.value;
         formData.append('podcastId', selectedPodcastId);
 
+        const waitingModal = document.getElementById('waiting-modal');
+        waitingModal.style.display = 'block';
+
+        // Aggiungiamo un timeout
+        const timeoutId = setTimeout(() => {
+            waitingModal.style.display = 'none';
+            alert('La richiesta sta impiegando più tempo del previsto. Riprova più tardi.');
+        }, 30000); // 30 secondi di timeout
+
         fetch('/api/process-audio', {
             method: 'POST',
             body: formData
         })
         .then(response => response.json())
         .then(data => {
+            clearTimeout(timeoutId); // Annulliamo il timeout se la risposta arriva in tempo
             if (data.audioUrl) {
                 playResponse(data.audioUrl);
+            } else {
+                throw new Error('URL audio non ricevuto dal server');
             }
         })
         .catch(error => {
+            clearTimeout(timeoutId); // Annulliamo il timeout in caso di errore
             console.error('Errore nell\'invio dell\'audio:', error);
-            // Nascondi la finestra di attesa in caso di errore
             waitingModal.style.display = 'none';
+            alert('Si è verificato un errore durante l\'elaborazione dell\'audio. Riprova.');
         });
     }
 
     function playResponse(audioUrl) {
         const podcastPlayer = document.getElementById('audio-player');
         const responsePlayer = document.getElementById('response-player');
+        const waitingModal = document.getElementById('waiting-modal');
         
         const podcastCurrentTime = podcastPlayer.currentTime;
         const podcastWasPlaying = !podcastPlayer.paused;
@@ -724,15 +738,29 @@ function initializePushToTalk() {
         }
         
         responsePlayer.src = audioUrl;
-        responsePlayer.onloadeddata = function() {
-            // Nascondi la finestra di attesa quando l'audio è pronto per essere riprodotto
+        
+        // Aggiungiamo un gestore di errori
+        responsePlayer.onerror = function() {
+            console.error('Errore durante il caricamento dell\'audio:', responsePlayer.error);
             waitingModal.style.display = 'none';
-            responsePlayer.play();
+            alert('Si è verificato un errore durante il caricamento dell\'audio. Riprova.');
         };
+        
+        responsePlayer.oncanplaythrough = function() {
+            // L'audio è completamente caricato e pronto per essere riprodotto
+            waitingModal.style.display = 'none';
+            responsePlayer.play().catch(function(error) {
+                console.error('Errore durante la riproduzione dell\'audio:', error);
+                alert('Si è verificato un errore durante la riproduzione dell\'audio. Potrebbe essere necessario consentire la riproduzione automatica nelle impostazioni del browser.');
+            });
+        };
+        
         responsePlayer.onended = function() {
             if (podcastWasPlaying) {
                 podcastPlayer.currentTime = podcastCurrentTime;
-                podcastPlayer.play();
+                podcastPlayer.play().catch(function(error) {
+                    console.error('Errore durante la riproduzione del podcast:', error);
+                });
             }
         };
     }
