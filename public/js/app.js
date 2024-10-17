@@ -300,16 +300,20 @@ function showAddLinkModal() {
 
 function toggleContentAccordion() {
     const accordion = document.getElementById('manualContentAccordion');
-    const header = accordion.previousElementSibling;
-    const icon = header.querySelector('.accordion-icon');
-    if (accordion.style.display === 'block') {
-        accordion.style.display = 'none';
-        icon.textContent = '▼';
-        header.classList.remove('active');
-    } else {
+    const modal = document.getElementById('addLinkModal');
+    const modalContent = modal.querySelector('.modal-content');
+
+    accordion.classList.toggle('active');
+
+    if (accordion.classList.contains('active')) {
         accordion.style.display = 'block';
-        icon.textContent = '▲';
-        header.classList.add('active');
+        accordion.style.maxHeight = accordion.scrollHeight + "px";
+        modalContent.scrollTop = modalContent.scrollHeight;
+    } else {
+        accordion.style.maxHeight = "0";
+        setTimeout(() => {
+            accordion.style.display = 'none';
+        }, 300);
     }
 }
 

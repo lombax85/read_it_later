@@ -1026,3 +1026,39 @@ html, body {
 * {
     max-width: 100%;
 }
+
+/* Modifica gli stili dell'accordion nel modale */
+#addLinkModal .accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    padding: 0 15px;
+}
+
+#addLinkModal .accordion-content.active {
+    opacity: 1;
+    padding: 15px;
+}
+
+/* Assicurati che il modale possa scrollare se il contenuto è troppo lungo */
+#addLinkModal .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Stile per l'icona dell'accordion */
+.accordion-icon {
+    transition: transform 0.3s ease;
+}
+
+.accordion-header.active .accordion-icon {
+    transform: rotate(180deg);
+}
+
+/* Aggiungi questo nuovo stile */
+#manualContent {
+    width: 100%;
+    min-height: 100px;
+    resize: vertical;
+}
