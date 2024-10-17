@@ -632,11 +632,14 @@ function initializePushToTalk() {
     const pushToTalkButton = document.getElementById('push-to-talk');
     const audioPlayer = document.getElementById('audio-player');
     const waitingModal = document.getElementById('waiting-modal');
+    const permissionModal = document.getElementById('permission-modal');
+    const requestPermissionButton = document.getElementById('request-permission');
     let isRecording = false;
     let mediaRecorder;
     let audioChunks = [];
 
     pushToTalkButton.addEventListener('click', toggleRecording);
+    requestPermissionButton.addEventListener('click', requestMicrophonePermission);
 
     function toggleRecording() {
         if (isRecording) {
@@ -646,19 +649,31 @@ function initializePushToTalk() {
         }
     }
 
+    async function requestMicrophonePermission() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            permissionModal.style.display = 'none';
+            stream.getTracks().forEach(track => track.stop());
+        } catch (error) {
+            console.error('Errore nella richiesta di autorizzazione:', error);
+            alert('Non è stato possibile ottenere l\'accesso al microfono. Assicurati di concedere l\'autorizzazione nelle impostazioni del browser.');
+        }
+    }
+
     async function startRecording() {
         if (isRecording) return;
-        isRecording = true;
-
-        if (!audioPlayer.paused) {
-            audioPlayer.pause();
-        }
-
-        pushToTalkButton.classList.add('recording');
-        pushToTalkButton.innerHTML = 'Stop';
 
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            isRecording = true;
+
+            if (!audioPlayer.paused) {
+                audioPlayer.pause();
+            }
+
+            pushToTalkButton.classList.add('recording');
+            pushToTalkButton.innerHTML = 'Stop';
+
             mediaRecorder = new MediaRecorder(stream);
             audioChunks = [];
 
@@ -669,9 +684,14 @@ function initializePushToTalk() {
             mediaRecorder.start();
         } catch (error) {
             console.error('Errore nell\'avvio della registrazione:', error);
+            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                permissionModal.style.display = 'block';
+            } else {
+                alert('Si è verificato un errore durante l\'accesso al microfono. Riprova.');
+            }
             isRecording = false;
             pushToTalkButton.classList.remove('recording');
-            pushToTalkButton.innerHTML = 'Registra';
+            pushToTalkButton.innerHTML = 'Chiedi';
         }
     }
 
@@ -682,7 +702,7 @@ function initializePushToTalk() {
         if (mediaRecorder && mediaRecorder.state === 'recording') {
             mediaRecorder.stop();
             pushToTalkButton.classList.remove('recording');
-            pushToTalkButton.innerHTML = 'Registra';
+            pushToTalkButton.innerHTML = 'Chiedi';
 
             waitingModal.style.display = 'block';
 
