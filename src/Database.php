@@ -70,9 +70,26 @@ class Database
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 filename TEXT NOT NULL,
                 title TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                link_ids TEXT
             )
         ");
+
+        // Verifica se la colonna link_ids esiste già nella tabella podcasts
+        $result = $this->connection->query("PRAGMA table_info(podcasts)");
+        $columns = $result->fetchAll(PDO::FETCH_ASSOC);
+        $linkIdsExists = false;
+        foreach ($columns as $column) {
+            if ($column['name'] === 'link_ids') {
+                $linkIdsExists = true;
+                break;
+            }
+        }
+
+        // Se la colonna link_ids non esiste, aggiungila
+        if (!$linkIdsExists) {
+            $this->connection->exec("ALTER TABLE podcasts ADD COLUMN link_ids TEXT");
+        }
 
         // Aggiungiamo la colonna content se non esiste già
         $result = $this->connection->query("PRAGMA table_info(links)");

@@ -25,7 +25,7 @@ class PodcastGenerator {
         $title = $this->generateTitle($contents);
         $audioFile = $this->generateAudio($script, $language);
 
-        $podcast = new Podcast($audioFile, $title);
+        $podcast = new Podcast($audioFile, $title, $linkIds);
         $podcast->save();
 
         return ['audioFile' => $audioFile, 'title' => $title];
