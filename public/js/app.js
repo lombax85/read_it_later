@@ -710,9 +710,23 @@ function initializePushToTalk() {
         })
         .then(response => response.json())
         .then(data => {
-            clearTimeout(timeoutId); // Annulliamo il timeout se la risposta arriva in tempo
+            clearTimeout(timeoutId);
             if (data.audioUrl) {
-                playResponse(data.audioUrl);
+                // Verifichiamo che il file audio esista
+                fetch(data.audioUrl, { method: 'HEAD' })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('File audio trovato, avvio riproduzione');
+                            playResponse(data.audioUrl);
+                        } else {
+                            throw new Error('File audio non trovato');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Errore nel controllo del file audio:', error);
+                        waitingModal.style.display = 'none';
+                        alert('Si è verificato un errore nel caricamento dell\'audio. Riprova.');
+                    });
             } else {
                 throw new Error('URL audio non ricevuto dal server');
             }
@@ -737,7 +751,11 @@ function initializePushToTalk() {
             podcastPlayer.pause();
         }
         
-        responsePlayer.src = audioUrl;
+        // Aggiungiamo un timestamp per evitare il caching
+        const noCacheAudioUrl = audioUrl + '?t=' + new Date().getTime();
+        responsePlayer.src = noCacheAudioUrl;
+        
+        console.log('Audio URL:', noCacheAudioUrl); // Log per debugging
         
         // Aggiungiamo un gestore di errori
         responsePlayer.onerror = function() {
@@ -746,16 +764,23 @@ function initializePushToTalk() {
             alert('Si è verificato un errore durante il caricamento dell\'audio. Riprova.');
         };
         
+        responsePlayer.onloadedmetadata = function() {
+            console.log('Metadata caricati'); // Log per debugging
+        };
+        
         responsePlayer.oncanplaythrough = function() {
-            // L'audio è completamente caricato e pronto per essere riprodotto
+            console.log('Audio pronto per la riproduzione'); // Log per debugging
             waitingModal.style.display = 'none';
-            responsePlayer.play().catch(function(error) {
+            responsePlayer.play().then(() => {
+                console.log('Riproduzione avviata con successo');
+            }).catch(function(error) {
                 console.error('Errore durante la riproduzione dell\'audio:', error);
                 alert('Si è verificato un errore durante la riproduzione dell\'audio. Potrebbe essere necessario consentire la riproduzione automatica nelle impostazioni del browser.');
             });
         };
         
         responsePlayer.onended = function() {
+            console.log('Riproduzione terminata'); // Log per debugging
             if (podcastWasPlaying) {
                 podcastPlayer.currentTime = podcastCurrentTime;
                 podcastPlayer.play().catch(function(error) {
