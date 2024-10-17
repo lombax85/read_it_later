@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     handleResize();
     changePodcast();
     initializeAccordion(); // Aggiungi questa chiamata
+    initializePushToTalk();
 
     const searchInput = document.getElementById('searchInput');
     searchInput.addEventListener('input', function() {
@@ -19,6 +20,8 @@ let allLinks = [];
 let currentChatLinkId = null;
 let chatHistory = [];
 let chatMemory = {};
+let mediaRecorder;
+let audioChunks = [];
 
 function fetchLinks() {
     fetch('./api/links')
@@ -623,4 +626,98 @@ function sendChatMessage(message) {
         // Non aggiungiamo più il messaggio alla memoria qui, lo fa già addMessageToChat
     })
     .catch(error => console.error('Errore nell\'invio del messaggio:', error));
+}
+
+function initializePushToTalk() {
+    const pushToTalkButton = document.getElementById('push-to-talk');
+    const audioPlayer = document.getElementById('audio-player');
+    let isRecording = false;
+    let audioChunks = [];
+
+    pushToTalkButton.addEventListener('mousedown', startRecording);
+    pushToTalkButton.addEventListener('mouseup', stopRecording);
+    pushToTalkButton.addEventListener('mouseleave', stopRecording);
+
+    async function startRecording() {
+        if (isRecording) return; // Previene l'avvio di più registrazioni contemporaneamente
+        isRecording = true;
+
+        if (!audioPlayer.paused) {
+            audioPlayer.pause();
+        }
+
+        pushToTalkButton.classList.add('recording');
+        pushToTalkButton.innerHTML = '<i class="fas fa-pause"></i>';
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            mediaRecorder.addEventListener('dataavailable', event => {
+                audioChunks.push(event.data);
+            });
+
+            mediaRecorder.start();
+        } catch (error) {
+            console.error('Errore nell\'avvio della registrazione:', error);
+            isRecording = false;
+            pushToTalkButton.classList.remove('recording');
+            pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
+        }
+    }
+
+    function stopRecording() {
+        if (!isRecording) return; // Previene la chiamata multipla di stopRecording
+        isRecording = false;
+
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            pushToTalkButton.classList.remove('recording');
+            pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
+
+            mediaRecorder.addEventListener('stop', () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                sendAudioToServer(audioBlob);
+            }, { once: true }); // Assicura che l'evento 'stop' venga gestito una sola volta
+        }
+    }
+
+    function sendAudioToServer(audioBlob) {
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'recording.wav');
+
+        fetch('/api/process-audio', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.audioUrl) {
+                playResponse(data.audioUrl);
+            }
+        })
+        .catch(error => console.error('Errore nell\'invio dell\'audio:', error));
+    }
+
+    function playResponse(audioUrl) {
+        const podcastPlayer = document.getElementById('audio-player');
+        const responsePlayer = document.getElementById('response-player');
+        
+        const podcastCurrentTime = podcastPlayer.currentTime;
+        const podcastWasPlaying = !podcastPlayer.paused;
+        
+        if (podcastWasPlaying) {
+            podcastPlayer.pause();
+        }
+        
+        responsePlayer.src = audioUrl;
+        responsePlayer.onended = function() {
+            if (podcastWasPlaying) {
+                podcastPlayer.currentTime = podcastCurrentTime;
+                podcastPlayer.play();
+            }
+        };
+        responsePlayer.play();
+    }
 }

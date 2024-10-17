@@ -39,9 +39,14 @@
                 <select id="podcast-select" onchange="changePodcast()">
                     <option value="">Seleziona un podcast</option>
                 </select>
-                <audio id="audio-player" controls>
-                    Il tuo browser non supporta l'elemento audio.
-                </audio>
+                <div class="player-controls">
+                    <audio id="audio-player" controls>
+                        Il tuo browser non supporta l'elemento audio.
+                    </audio>
+                    <button id="push-to-talk" class="push-to-talk-button">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -138,6 +143,9 @@
             </form>
         </div>
     </div>
+
+    <!-- Aggiungi questo elemento dopo il div #podcast-section -->
+    <audio id="response-player" style="display: none;"></audio>
 
     <script src="./js/app.js"></script>
 </body>

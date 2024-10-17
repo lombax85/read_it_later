@@ -40,4 +40,18 @@ class ChatService {
 
         return $response->choices[0]->message->content;
     }
+
+    public function generatePodcastResponse($transcription) {
+        $response = $this->client->chat()->create([
+            'model' => 'gpt-4',
+            'messages' => [
+                ['role' => 'system', 'content' => 'Sei un assistente esperto che risponde a domande su podcast. Fornisci risposte concise e pertinenti.'],
+                ['role' => 'user', 'content' => $transcription]
+            ],
+            'max_tokens' => 150,
+            'temperature' => 0.7,
+        ]);
+
+        return $response->choices[0]->message->content;
+    }
 }

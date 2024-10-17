@@ -392,7 +392,7 @@ h1 del + span {
     transform: rotate(45deg);
 }
 
-/* Stile per la sezione del podcast */
+/* Modifica gli stili esistenti per il podcast player */
 #podcast-section {
     background-color: #f0f0f0;
     border-radius: 8px;
@@ -404,7 +404,8 @@ h1 del + span {
 #podcast-player {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
+    width: 100%;
 }
 
 #podcast-player h2 {
@@ -423,9 +424,33 @@ h1 del + span {
     color: #333;
 }
 
-#audio-player {
+.player-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
-    margin-top: 10px;
+}
+
+#audio-player {
+    flex-grow: 1;
+    width: calc(100% - 70px); /* Sottrai la larghezza del pulsante push-to-talk più un po' di spazio */
+    margin-right: 10px;
+}
+
+.push-to-talk-button {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
 }
 
 /* Stile personalizzato per il player audio */
@@ -452,6 +477,21 @@ audio::-webkit-media-controls-time-remaining-display {
     #podcast-select,
     #audio-player {
         width: 100%;
+    }
+
+    .player-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #audio-player {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .push-to-talk-button {
+        align-self: center;
     }
 }
 
@@ -1061,4 +1101,39 @@ html, body {
     width: 100%;
     min-height: 100px;
     resize: vertical;
+}
+
+.player-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+#audio-player {
+    flex-grow: 1;
+    margin-right: 15px;
+}
+
+.push-to-talk-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+
+.push-to-talk-button:hover {
+    background-color: #45a049;
+}
+
+.push-to-talk-button.recording {
+    background-color: #ff4d4d;
 }

@@ -58,3 +58,9 @@ sync.sh
 # ignore Podcasts except .gitkeep
 /public/podcasts/*
 !.gitkeep
+
+/public/temp/*
+!.gitkeep
+
+/public/uploads/*
+!.gitkeep

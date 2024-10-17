@@ -25,6 +25,8 @@ use App\Services\LinkCategorizer;
 use App\Services\PodcastGenerator;
 use App\Models\Podcast;
 use App\Services\ChatService;
+use App\Services\TranscriptionService;
+use App\Services\TextToSpeechService;
 
 // Inizializzazione dell'applicazione
 $app = new App();
@@ -231,6 +233,55 @@ $app->post('/api/chat', function ($request, $response) {
 
     return $response->withJson(['reply' => $reply]);
 });
+
+// Aggiungi questo nuovo endpoint dopo gli altri
+$app->post('/api/process-audio', function ($request, $response) {
+    $uploadedFiles = $request->getUploadedFiles();
+    $audioFile = $uploadedFiles['audio'];
+
+    if ($audioFile->getError() === UPLOAD_ERR_OK) {
+        $filename = moveUploadedFile($audioFile);
+        $transcriptionService = new TranscriptionService();
+        $transcription = $transcriptionService->transcribe($filename);
+
+        $chatService = new ChatService();
+        $aiResponse = $chatService->generatePodcastResponse($transcription);
+
+        $ttsService = new TextToSpeechService();
+        $audioUrl = $ttsService->generateSpeech($aiResponse);
+
+        cleanupTempFiles(); // Aggiungi questa chiamata alla fine della funzione
+
+        return $response->withJson(['audioUrl' => $audioUrl]);
+    }
+
+    return $response->withStatus(400)->withJson(['error' => 'Errore nel caricamento del file audio']);
+});
+
+function moveUploadedFile($uploadedFile) {
+    $directory = __DIR__ . '/uploads';
+    $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
+    $basename = bin2hex(random_bytes(8));
+    $filename = sprintf('%s.%0.8s', $basename, $extension);
+
+    $uploadedFile->moveTo($directory . DIRECTORY_SEPARATOR . $filename);
+
+    return $filename;
+}
+
+function cleanupTempFiles() {
+    $tempDir = __DIR__ . '/temp';
+    $files = glob($tempDir . '/*');
+    $now = time();
+
+    foreach ($files as $file) {
+        if (is_file($file)) {
+            if ($now - filemtime($file) >= 3600) { // Rimuovi file più vecchi di 1 ora
+                unlink($file);
+            }
+        }
+    }
+}
 
 // Esecuzione dell'applicazione
 $app->run();
