@@ -635,12 +635,19 @@ function initializePushToTalk() {
     let isRecording = false;
     let audioChunks = [];
 
+    // Aggiungi questi gestori di eventi touch
+    pushToTalkButton.addEventListener('touchstart', startRecording);
+    pushToTalkButton.addEventListener('touchend', stopRecording);
+    pushToTalkButton.addEventListener('touchcancel', stopRecording);
+
+    // Mantieni anche i gestori di eventi del mouse per la compatibilità con i desktop
     pushToTalkButton.addEventListener('mousedown', startRecording);
     pushToTalkButton.addEventListener('mouseup', stopRecording);
     pushToTalkButton.addEventListener('mouseleave', stopRecording);
 
-    async function startRecording() {
-        if (isRecording) return; // Previene l'avvio di più registrazioni contemporaneamente
+    async function startRecording(event) {
+        event.preventDefault(); // Previene il comportamento predefinito del touch
+        if (isRecording) return;
         isRecording = true;
 
         if (!audioPlayer.paused) {
@@ -668,7 +675,8 @@ function initializePushToTalk() {
         }
     }
 
-    function stopRecording() {
+    function stopRecording(event) {
+        event.preventDefault(); // Previene il comportamento predefinito del touch
         if (!isRecording) return;
         isRecording = false;
 
@@ -677,7 +685,6 @@ function initializePushToTalk() {
             pushToTalkButton.classList.remove('recording');
             pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
 
-            // Mostra la finestra di attesa
             waitingModal.style.display = 'block';
 
             mediaRecorder.addEventListener('stop', () => {
