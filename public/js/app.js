@@ -246,7 +246,17 @@ function showSummaryInAccordion(id, summary) {
 function toggleAccordion(id) {
     const item = document.getElementById(`accordion-item-${id}`);
     const content = item.querySelector('.accordion-content');
+    const allItems = document.querySelectorAll('.accordion-item');
     
+    // Chiudi tutti gli altri accordion
+    allItems.forEach(otherItem => {
+        if (otherItem !== item && otherItem.classList.contains('active')) {
+            otherItem.classList.remove('active');
+            otherItem.querySelector('.accordion-content').style.maxHeight = '0';
+        }
+    });
+
+    // Apri o chiudi l'accordion corrente
     if (item.classList.contains('active')) {
         item.classList.remove('active');
         content.style.maxHeight = '0';

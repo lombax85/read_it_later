@@ -146,6 +146,20 @@ h1 del + span {
     border-radius: 0 0 4px 4px;
     border: 1px solid #e9ecef;
     border-top: none;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease;
+}
+
+.accordion-item.active .accordion-content {
+    max-height: 1000px; /* Un valore sufficientemente grande per contenere il contenuto */
+    padding: 15px;
+}
+
+/* Aggiungi questi nuovi stili */
+.accordion-item:not(.active) .accordion-content {
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .accordion-content p {
