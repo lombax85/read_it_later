@@ -61,7 +61,7 @@ class ChatService {
                         "E questo è lo script del podcast:\n\n" . $podcastScript;
 
         $response = $this->client->chat()->create([
-            'model' => 'gpt-4',
+            'model' => 'gpt-4o-mini',
             'messages' => [
                 ['role' => 'system', 'content' => $systemPrompt],
                 ['role' => 'user', 'content' => $transcription]
