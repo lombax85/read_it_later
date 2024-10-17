@@ -3,14 +3,16 @@ html, body {
     overflow-x: hidden;
     width: 100%;
     position: relative;
+    margin: 0;
+    padding: 0;
 }
 
 body {
     font-family: 'Arial', sans-serif;
     line-height: 1.6;
     color: #333;
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 100%;
+    box-sizing: border-box;
     padding: 20px;
     background-color: #f4f4f4;
 }
@@ -977,9 +979,20 @@ html, body {
     .search-container,
     #searchInput,
     .add-link-button,
-    #generatePodcastButton {
+    #generatePodcastButton,
+    .button-container,
+    h1,
+    #link-list,
+    #unread-link-list,
+    #read-link-list,
+    #read-links-section {
         max-width: 100%;
+        width: 100%;
         box-sizing: border-box;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 0;
+        padding-right: 0;
     }
 
     /* Gestisci il overflow per contenuti lunghi */
@@ -989,4 +1002,27 @@ html, body {
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
+
+    /* Assicurati che le immagini non causino overflow */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Riduci il padding per elementi che potrebbero causare overflow */
+    .link-item,
+    .modal-content {
+        padding: 10px;
+    }
+
+    /* Assicurati che i pulsanti non causino overflow */
+    button {
+        max-width: 100%;
+        white-space: normal;
+    }
+}
+
+/* Aggiungi questa regola alla fine del file */
+* {
+    max-width: 100%;
 }
