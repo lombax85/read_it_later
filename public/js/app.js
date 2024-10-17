@@ -775,7 +775,7 @@ function initializePushToTalk() {
                 console.log('Riproduzione avviata con successo');
             }).catch(function(error) {
                 console.error('Errore durante la riproduzione dell\'audio:', error);
-                alert('Si è verificato un errore durante la riproduzione dell\'audio. Potrebbe essere necessario consentire la riproduzione automatica nelle impostazioni del browser.');
+                alert('Si è verificato un errore durante la riproduzione dell\'audio. Prova a premere il pulsante play manualmente.');
             });
         };
         

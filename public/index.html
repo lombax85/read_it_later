@@ -47,6 +47,10 @@
                         <i class="fas fa-microphone"></i>
                     </button>
                 </div>
+                <!-- Aggiungi questo elemento audio per la risposta -->
+                <audio id="response-player" controls style="width: 100%; margin-top: 10px;">
+                    Il tuo browser non supporta l'elemento audio.
+                </audio>
             </div>
         </div>
 
@@ -145,9 +149,6 @@
     </div>
 
     <!-- Aggiungi questo elemento dopo il div #podcast-section -->
-    <audio id="response-player" style="display: none;"></audio>
-
-    <!-- Aggiungi questo codice dopo l'elemento audio#response-player -->
     <div id="waiting-modal" class="modal">
         <div class="modal-content">
             <p>Elaborazione in corso...</p>
