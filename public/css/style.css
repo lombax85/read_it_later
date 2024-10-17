@@ -438,24 +438,19 @@ h1 del + span {
 }
 
 .push-to-talk-button {
-    width: auto;
-    height: auto;
-    padding: 10px 20px;
-    border-radius: 5px;
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    border-radius: 50%;
     background-color: #4CAF50;
     border: none;
     color: white;
-    font-size: 16px;
+    font-size: 24px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: background-color 0.3s;
-}
-
-.push-to-talk-button:hover {
-    background-color: #45a049;
-}
-
-.push-to-talk-button.recording {
-    background-color: #ff4d4d;
 }
 
 /* Stile personalizzato per il player audio */
@@ -1269,46 +1264,4 @@ html, body {
     color: #000;
     text-decoration: none;
     cursor: pointer;
-}
-
-/* Previene lo zoom su doppio tap su iOS */
-@media screen and (-webkit-min-device-pixel-ratio:0) { 
-    .push-to-talk-button {
-        font-size: 16px;
-    }
-}
-
-#permission-modal {
-    display: none;
-    position: fixed;
-    z-index: 1002;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-}
-
-#permission-modal .modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 300px;
-    text-align: center;
-}
-
-#request-permission {
-    margin-top: 15px;
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#request-permission:hover {
-    background-color: #45a049;
 }

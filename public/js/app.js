@@ -632,48 +632,26 @@ function initializePushToTalk() {
     const pushToTalkButton = document.getElementById('push-to-talk');
     const audioPlayer = document.getElementById('audio-player');
     const waitingModal = document.getElementById('waiting-modal');
-    const permissionModal = document.getElementById('permission-modal');
-    const requestPermissionButton = document.getElementById('request-permission');
     let isRecording = false;
-    let mediaRecorder;
     let audioChunks = [];
 
-    pushToTalkButton.addEventListener('click', toggleRecording);
-    requestPermissionButton.addEventListener('click', requestMicrophonePermission);
-
-    function toggleRecording() {
-        if (isRecording) {
-            stopRecording();
-        } else {
-            startRecording();
-        }
-    }
-
-    async function requestMicrophonePermission() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            permissionModal.style.display = 'none';
-            stream.getTracks().forEach(track => track.stop());
-        } catch (error) {
-            console.error('Errore nella richiesta di autorizzazione:', error);
-            alert('Non è stato possibile ottenere l\'accesso al microfono. Assicurati di concedere l\'autorizzazione nelle impostazioni del browser.');
-        }
-    }
+    pushToTalkButton.addEventListener('mousedown', startRecording);
+    pushToTalkButton.addEventListener('mouseup', stopRecording);
+    pushToTalkButton.addEventListener('mouseleave', stopRecording);
 
     async function startRecording() {
-        if (isRecording) return;
+        if (isRecording) return; // Previene l'avvio di più registrazioni contemporaneamente
+        isRecording = true;
+
+        if (!audioPlayer.paused) {
+            audioPlayer.pause();
+        }
+
+        pushToTalkButton.classList.add('recording');
+        pushToTalkButton.innerHTML = '<i class="fas fa-pause"></i>';
 
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            isRecording = true;
-
-            if (!audioPlayer.paused) {
-                audioPlayer.pause();
-            }
-
-            pushToTalkButton.classList.add('recording');
-            pushToTalkButton.innerHTML = 'Stop';
-
             mediaRecorder = new MediaRecorder(stream);
             audioChunks = [];
 
@@ -684,17 +662,9 @@ function initializePushToTalk() {
             mediaRecorder.start();
         } catch (error) {
             console.error('Errore nell\'avvio della registrazione:', error);
-            let errorMessage = `Errore: ${error.name} - ${error.message}`;
-            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-                permissionModal.style.display = 'block';
-                errorMessage += '\nPermesso negato. Per favore, concedi l\'accesso al microfono nelle impostazioni del browser.';
-            } else {
-                errorMessage += '\nSi è verificato un errore durante l\'accesso al microfono. Riprova.';
-            }
-            alert(errorMessage);
             isRecording = false;
             pushToTalkButton.classList.remove('recording');
-            pushToTalkButton.innerHTML = 'Chiedi';
+            pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
         }
     }
 
@@ -705,8 +675,9 @@ function initializePushToTalk() {
         if (mediaRecorder && mediaRecorder.state === 'recording') {
             mediaRecorder.stop();
             pushToTalkButton.classList.remove('recording');
-            pushToTalkButton.innerHTML = 'Chiedi';
+            pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
 
+            // Mostra la finestra di attesa
             waitingModal.style.display = 'block';
 
             mediaRecorder.addEventListener('stop', () => {
