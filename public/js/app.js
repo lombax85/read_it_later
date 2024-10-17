@@ -772,12 +772,12 @@ function initializePushToTalk() {
         responsePlayer.oncanplaythrough = function() {
             console.log('Audio pronto per la riproduzione'); // Log per debugging
             waitingModal.style.display = 'none'; // Assicuriamoci che la modale sia nascosta
-            responsePlayer.play().then(() => {
-                console.log('Riproduzione avviata con successo');
-            }).catch(function(error) {
-                console.error('Errore durante la riproduzione dell\'audio:', error);
-                alert('Si è verificato un errore durante la riproduzione dell\'audio. Prova a premere il pulsante play manualmente.');
-            });
+            
+            // Invece di riprodurre automaticamente, mostriamo un messaggio all'utente
+            alert('La risposta è pronta. Premi il pulsante play per ascoltarla.');
+            
+            // Rendiamo visibile il player di risposta
+            responsePlayer.style.display = 'block';
         };
         
         responsePlayer.onended = function() {
