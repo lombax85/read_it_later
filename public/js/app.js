@@ -686,6 +686,11 @@ function initializePushToTalk() {
     function sendAudioToServer(audioBlob) {
         const formData = new FormData();
         formData.append('audio', audioBlob, 'recording.wav');
+        
+        // Ottieni l'ID del podcast selezionato
+        const podcastSelect = document.getElementById('podcast-select');
+        const selectedPodcastId = podcastSelect.value;
+        formData.append('podcastId', selectedPodcastId);
 
         fetch('/api/process-audio', {
             method: 'POST',

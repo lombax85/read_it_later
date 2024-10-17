@@ -41,6 +41,31 @@ class Podcast {
 
     // Getter per linkIds
     public function getLinkIds() {
-        return explode(',', $this->linkIds);
+        return $this->linkIds;
+    }
+
+    public function getScript() {
+        // Assumiamo che lo script sia memorizzato in una colonna 'script' nel database
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("SELECT script FROM podcasts WHERE id = ?");
+        $stmt->execute([$this->id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['script'] ?? '';
+    }
+
+    public static function getByFilename($id) {
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("SELECT * FROM podcasts WHERE filename = ?");
+        $stmt->execute([$id]);
+        $podcast = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($podcast) {
+            $podcastObject = new self($podcast['filename'], $podcast['title'], explode(',', $podcast['link_ids']));
+            $podcastObject->id = $podcast['id'];
+            $podcastObject->createdAt = $podcast['created_at'];
+            return $podcastObject;
+        }
+        
+        return null;
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use OpenAI;
+use App\Models\Podcast;
+use App\Models\Link;
 
 class ChatService {
     private $client;
@@ -41,17 +43,56 @@ class ChatService {
         return $response->choices[0]->message->content;
     }
 
-    public function generatePodcastResponse($transcription) {
+    public function generatePodcastResponse($transcription, $podcastId) {
+        $podcast = Podcast::getByFilename($podcastId);
+        if (!$podcast) {
+            throw new \Exception('Podcast non trovato');
+        }
+
+        $linkIds = $podcast->getLinkIds();
+        $articlesContent = $this->getArticlesContent($linkIds);
+        $podcastScript = $this->getPodcastScript($linkIds);
+
+        $systemPrompt = "Sei un assistente esperto che risponde a domande su un podcast specifico, nella lingua in cui l'utente ha effettuato la domanda. " .
+                        "L'utente sta ascoltando un podcast, ma ha interrotto la riproduzione per fare una domanda di approfondimento. " .
+                        "Ti fornirò il testo degli articoli originali e lo script del podcast. " .
+                        "Dovrai rispondere contestualmente in base a queste informazioni, fornendo risposte concise e pertinenti. " .
+                        "Ecco il contenuto degli articoli originali:\n\n" . $articlesContent . "\n\n" .
+                        "E questo è lo script del podcast:\n\n" . $podcastScript;
+
         $response = $this->client->chat()->create([
             'model' => 'gpt-4',
             'messages' => [
-                ['role' => 'system', 'content' => 'Sei un assistente esperto che risponde a domande su podcast. Fornisci risposte concise e pertinenti.'],
+                ['role' => 'system', 'content' => $systemPrompt],
                 ['role' => 'user', 'content' => $transcription]
             ],
-            'max_tokens' => 150,
+            'max_tokens' => 300,
             'temperature' => 0.7,
         ]);
 
         return $response->choices[0]->message->content;
+    }
+
+    private function getArticlesContent($linkIds) {
+        $content = "";
+        foreach ($linkIds as $id) {
+            $link = Link::getById($id);
+            if ($link) {
+                $content .= "Articolo: " . $link->getTitle() . "\n";
+                $content .= $link->getContent() . "\n\n";
+            }
+        }
+        return $content;
+    }
+
+    private function getPodcastScript($linkIds) {
+        $script = "";
+        foreach ($linkIds as $id) {
+            $link = Link::getById($id);
+            if ($link) {
+                $script .= $link->getContent() . "\n\n";
+            }
+        }
+        return $script;
     }
 }

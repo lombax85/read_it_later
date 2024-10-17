@@ -238,24 +238,25 @@ $app->post('/api/chat', function ($request, $response) {
 $app->post('/api/process-audio', function ($request, $response) {
     $uploadedFiles = $request->getUploadedFiles();
     $audioFile = $uploadedFiles['audio'];
+    $podcastId = $request->getParsedBody()['podcastId'] ?? null;
 
-    if ($audioFile->getError() === UPLOAD_ERR_OK) {
+    if ($audioFile->getError() === UPLOAD_ERR_OK && $podcastId) {
         $filename = moveUploadedFile($audioFile);
         $transcriptionService = new TranscriptionService();
         $transcription = $transcriptionService->transcribe($filename);
 
         $chatService = new ChatService();
-        $aiResponse = $chatService->generatePodcastResponse($transcription);
+        $aiResponse = $chatService->generatePodcastResponse($transcription, $podcastId);
 
         $ttsService = new TextToSpeechService();
         $audioUrl = $ttsService->generateSpeech($aiResponse);
 
-        cleanupTempFiles(); // Aggiungi questa chiamata alla fine della funzione
+        cleanupTempFiles();
 
         return $response->withJson(['audioUrl' => $audioUrl]);
     }
 
-    return $response->withStatus(400)->withJson(['error' => 'Errore nel caricamento del file audio']);
+    return $response->withStatus(400)->withJson(['error' => 'Errore nel caricamento del file audio o ID del podcast mancante']);
 });
 
 function moveUploadedFile($uploadedFile) {
