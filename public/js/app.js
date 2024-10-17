@@ -696,7 +696,7 @@ function initializePushToTalk() {
         formData.append('podcastId', selectedPodcastId);
 
         const waitingModal = document.getElementById('waiting-modal');
-        waitingModal.style.display = 'block'; // Mostra la modale all'inizio del processo
+        waitingModal.style.display = 'block';
 
         // Aggiungiamo un timeout
         const timeoutId = setTimeout(() => {
@@ -732,7 +732,7 @@ function initializePushToTalk() {
             }
         })
         .catch(error => {
-            clearTimeout(timeoutId);
+            clearTimeout(timeoutId); // Annulliamo il timeout in caso di errore
             console.error('Errore nell\'invio dell\'audio:', error);
             waitingModal.style.display = 'none';
             alert('Si è verificato un errore durante l\'elaborazione dell\'audio. Riprova.');
@@ -766,12 +766,11 @@ function initializePushToTalk() {
         
         responsePlayer.onloadedmetadata = function() {
             console.log('Metadata caricati'); // Log per debugging
-            waitingModal.style.display = 'none'; // Nascondi la modale qui
         };
         
         responsePlayer.oncanplaythrough = function() {
             console.log('Audio pronto per la riproduzione'); // Log per debugging
-            waitingModal.style.display = 'none'; // Assicuriamoci che la modale sia nascosta
+            waitingModal.style.display = 'none';
             responsePlayer.play().then(() => {
                 console.log('Riproduzione avviata con successo');
             }).catch(function(error) {
