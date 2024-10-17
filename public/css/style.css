@@ -1,3 +1,10 @@
+/* Aggiungi queste regole all'inizio del file */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+}
+
 body {
     font-family: 'Arial', sans-serif;
     line-height: 1.6;
@@ -950,4 +957,36 @@ input, select, textarea {
 html, body {
     touch-action: manipulation;
     -webkit-text-size-adjust: 100%;
+}
+
+/* Modifica la media query esistente per dispositivi mobili */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* ... (altre regole per dispositivi mobili) ... */
+
+    /* Assicurati che tutti gli elementi non superino la larghezza del viewport */
+    .link-item,
+    .modal-content,
+    #podcast-section,
+    #audio-player,
+    .search-container,
+    #searchInput,
+    .add-link-button,
+    #generatePodcastButton {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Gestisci il overflow per contenuti lunghi */
+    .link-item,
+    .modal-content,
+    #chatMessages {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
 }
