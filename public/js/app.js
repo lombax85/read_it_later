@@ -684,11 +684,14 @@ function initializePushToTalk() {
             mediaRecorder.start();
         } catch (error) {
             console.error('Errore nell\'avvio della registrazione:', error);
+            let errorMessage = `Errore: ${error.name} - ${error.message}`;
             if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
                 permissionModal.style.display = 'block';
+                errorMessage += '\nPermesso negato. Per favore, concedi l\'accesso al microfono nelle impostazioni del browser.';
             } else {
-                alert('Si è verificato un errore durante l\'accesso al microfono. Riprova.');
+                errorMessage += '\nSi è verificato un errore durante l\'accesso al microfono. Riprova.';
             }
+            alert(errorMessage);
             isRecording = false;
             pushToTalkButton.classList.remove('recording');
             pushToTalkButton.innerHTML = 'Chiedi';
