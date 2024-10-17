@@ -631,6 +631,7 @@ function sendChatMessage(message) {
 function initializePushToTalk() {
     const pushToTalkButton = document.getElementById('push-to-talk');
     const audioPlayer = document.getElementById('audio-player');
+    const waitingModal = document.getElementById('waiting-modal');
     let isRecording = false;
     let audioChunks = [];
 
@@ -668,7 +669,7 @@ function initializePushToTalk() {
     }
 
     function stopRecording() {
-        if (!isRecording) return; // Previene la chiamata multipla di stopRecording
+        if (!isRecording) return;
         isRecording = false;
 
         if (mediaRecorder && mediaRecorder.state === 'recording') {
@@ -676,10 +677,13 @@ function initializePushToTalk() {
             pushToTalkButton.classList.remove('recording');
             pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
 
+            // Mostra la finestra di attesa
+            waitingModal.style.display = 'block';
+
             mediaRecorder.addEventListener('stop', () => {
                 const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                 sendAudioToServer(audioBlob);
-            }, { once: true }); // Assicura che l'evento 'stop' venga gestito una sola volta
+            }, { once: true });
         }
     }
 
@@ -687,7 +691,6 @@ function initializePushToTalk() {
         const formData = new FormData();
         formData.append('audio', audioBlob, 'recording.wav');
         
-        // Ottieni l'ID del podcast selezionato
         const podcastSelect = document.getElementById('podcast-select');
         const selectedPodcastId = podcastSelect.value;
         formData.append('podcastId', selectedPodcastId);
@@ -702,7 +705,11 @@ function initializePushToTalk() {
                 playResponse(data.audioUrl);
             }
         })
-        .catch(error => console.error('Errore nell\'invio dell\'audio:', error));
+        .catch(error => {
+            console.error('Errore nell\'invio dell\'audio:', error);
+            // Nascondi la finestra di attesa in caso di errore
+            waitingModal.style.display = 'none';
+        });
     }
 
     function playResponse(audioUrl) {
@@ -717,12 +724,16 @@ function initializePushToTalk() {
         }
         
         responsePlayer.src = audioUrl;
+        responsePlayer.onloadeddata = function() {
+            // Nascondi la finestra di attesa quando l'audio è pronto per essere riprodotto
+            waitingModal.style.display = 'none';
+            responsePlayer.play();
+        };
         responsePlayer.onended = function() {
             if (podcastWasPlaying) {
                 podcastPlayer.currentTime = podcastCurrentTime;
                 podcastPlayer.play();
             }
         };
-        responsePlayer.play();
     }
 }
