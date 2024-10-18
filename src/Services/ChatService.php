@@ -43,7 +43,7 @@ class ChatService {
         return $response->choices[0]->message->content;
     }
 
-    public function generatePodcastResponse($transcription, $podcastId) {
+    public function generatePodcastResponse($transcription, $podcastId, $conversationHistory = []) {
         $podcast = Podcast::getByFilename($podcastId);
         if (!$podcast) {
             throw new \Exception('Podcast non trovato');
@@ -60,12 +60,21 @@ class ChatService {
                         "Ecco il contenuto degli articoli originali:\n\n" . $articlesContent . "\n\n" .
                         "E questo è lo script del podcast:\n\n" . $podcastScript;
 
+        $messages = [
+            ['role' => 'system', 'content' => $systemPrompt],
+        ];
+
+        // Aggiungi la cronologia della conversazione
+        foreach ($conversationHistory as $message) {
+            $messages[] = $message;
+        }
+
+        // Aggiungi la nuova domanda dell'utente
+        $messages[] = ['role' => 'user', 'content' => $transcription];
+
         $response = $this->client->chat()->create([
             'model' => 'gpt-4o-mini',
-            'messages' => [
-                ['role' => 'system', 'content' => $systemPrompt],
-                ['role' => 'user', 'content' => $transcription]
-            ],
+            'messages' => $messages,
             'max_tokens' => 300,
             'temperature' => 0.7,
         ]);

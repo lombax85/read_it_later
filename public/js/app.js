@@ -22,6 +22,7 @@ let chatHistory = [];
 let chatMemory = {};
 let mediaRecorder;
 let audioChunks = [];
+let voiceConversationHistory = [];
 
 function fetchLinks() {
     fetch('./api/links')
@@ -715,14 +716,16 @@ function initializePushToTalk() {
         const selectedPodcastId = podcastSelect.value;
         formData.append('podcastId', selectedPodcastId);
 
-        const waitingModal = document.getElementById('waiting-modal');
-        waitingModal.style.display = 'block'; // Mostra la modale all'inizio del processo
+        // Aggiungi la cronologia della conversazione al FormData
+        formData.append('conversationHistory', JSON.stringify(voiceConversationHistory));
 
-        // Aggiungiamo un timeout
+        const waitingModal = document.getElementById('waiting-modal');
+        waitingModal.style.display = 'block';
+
         const timeoutId = setTimeout(() => {
             waitingModal.style.display = 'none';
             alert('La richiesta sta impiegando più tempo del previsto. Riprova più tardi.');
-        }, 30000); // 30 secondi di timeout
+        }, 30000);
 
         fetch('/api/process-audio', {
             method: 'POST',
@@ -732,12 +735,15 @@ function initializePushToTalk() {
         .then(data => {
             clearTimeout(timeoutId);
             if (data.audioUrl) {
-                // Verifichiamo che il file audio esista
                 fetch(data.audioUrl, { method: 'HEAD' })
                     .then(response => {
                         if (response.ok) {
                             console.log('File audio trovato, avvio riproduzione');
                             playResponse(data.audioUrl);
+                            // Aggiungiamo la domanda e la risposta alla cronologia
+                            voiceConversationHistory.push({ role: 'user', content: data.userTranscription });
+                            voiceConversationHistory.push({ role: 'assistant', content: data.aiResponse });
+                            console.log('Cronologia aggiornata:', voiceConversationHistory);
                         } else {
                             throw new Error('File audio non trovato');
                         }
@@ -771,13 +777,11 @@ function initializePushToTalk() {
             podcastPlayer.pause();
         }
         
-        // Aggiungiamo un timestamp per evitare il caching
         const noCacheAudioUrl = audioUrl + '?t=' + new Date().getTime();
         responsePlayer.src = noCacheAudioUrl;
         
-        console.log('Audio URL:', noCacheAudioUrl); // Log per debugging
+        console.log('Audio URL:', noCacheAudioUrl);
         
-        // Aggiungiamo un gestore di errori
         responsePlayer.onerror = function() {
             console.error('Errore durante il caricamento dell\'audio:', responsePlayer.error);
             waitingModal.style.display = 'none';
@@ -785,13 +789,13 @@ function initializePushToTalk() {
         };
         
         responsePlayer.onloadedmetadata = function() {
-            console.log('Metadata caricati'); // Log per debugging
-            waitingModal.style.display = 'none'; // Nascondi la modale qui
+            console.log('Metadata caricati');
+            waitingModal.style.display = 'none';
         };
         
         responsePlayer.oncanplaythrough = function() {
-            console.log('Audio pronto per la riproduzione'); // Log per debugging
-            waitingModal.style.display = 'none'; // Assicuriamoci che la modale sia nascosta
+            console.log('Audio pronto per la riproduzione');
+            waitingModal.style.display = 'none';
             responsePlayer.play().then(() => {
                 console.log('Riproduzione avviata con successo');
             }).catch(function(error) {
@@ -801,7 +805,7 @@ function initializePushToTalk() {
         };
         
         responsePlayer.onended = function() {
-            console.log('Riproduzione terminata'); // Log per debugging
+            console.log('Riproduzione terminata');
             if (podcastWasPlaying) {
                 podcastPlayer.currentTime = podcastCurrentTime;
                 podcastPlayer.play().catch(function(error) {
