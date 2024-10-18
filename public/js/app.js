@@ -644,6 +644,10 @@ function initializePushToTalk() {
             stopRecording();
         } else {
             try {
+                // Metti in pausa il podcast se è in riproduzione
+                if (!audioPlayer.paused) {
+                    audioPlayer.pause();
+                }
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 startRecording(stream);
             } catch (error) {
