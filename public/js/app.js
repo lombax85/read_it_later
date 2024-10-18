@@ -634,26 +634,33 @@ function initializePushToTalk() {
     const waitingModal = document.getElementById('waiting-modal');
     let isRecording = false;
     let audioChunks = [];
+    let mediaRecorder = null;
 
-    pushToTalkButton.addEventListener('mousedown', startRecording);
-    pushToTalkButton.addEventListener('mouseup', stopRecording);
-    pushToTalkButton.addEventListener('mouseleave', stopRecording);
+    pushToTalkButton.addEventListener('click', toggleRecording);
+
+    async function toggleRecording() {
+        if (isRecording) {
+            stopRecording();
+        } else {
+            await startRecording();
+        }
+    }
 
     async function startRecording() {
-        if (isRecording) return; // Previene l'avvio di più registrazioni contemporaneamente
+        if (isRecording) return;
         isRecording = true;
+        audioChunks = [];
 
         if (!audioPlayer.paused) {
             audioPlayer.pause();
         }
 
         pushToTalkButton.classList.add('recording');
-        pushToTalkButton.innerHTML = '<i class="fas fa-pause"></i>';
+        pushToTalkButton.innerHTML = '<i class="fas fa-stop"></i>';
 
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(stream);
-            audioChunks = [];
 
             mediaRecorder.addEventListener('dataavailable', event => {
                 audioChunks.push(event.data);
@@ -662,29 +669,42 @@ function initializePushToTalk() {
             mediaRecorder.start();
         } catch (error) {
             console.error('Errore nell\'avvio della registrazione:', error);
-            isRecording = false;
-            pushToTalkButton.classList.remove('recording');
-            pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
+            resetRecordingState();
         }
     }
 
     function stopRecording() {
-        if (!isRecording) return;
+        if (!isRecording || !mediaRecorder) return;
+        
+        mediaRecorder.stop();
         isRecording = false;
 
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-            pushToTalkButton.classList.remove('recording');
-            pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
+        pushToTalkButton.classList.remove('recording');
+        pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
 
-            // Mostra la finestra di attesa
-            waitingModal.style.display = 'block';
-
-            mediaRecorder.addEventListener('stop', () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        mediaRecorder.addEventListener('stop', () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            if (audioBlob.size > 0) {
                 sendAudioToServer(audioBlob);
-            }, { once: true });
+            } else {
+                console.error('Nessun audio registrato');
+                resetRecordingState();
+            }
+        }, { once: true });
+    }
+
+    function resetRecordingState() {
+        isRecording = false;
+        audioChunks = [];
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
         }
+        if (mediaRecorder && mediaRecorder.stream) {
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        }
+        mediaRecorder = null;
+        pushToTalkButton.classList.remove('recording');
+        pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
     }
 
     function sendAudioToServer(audioBlob) {
