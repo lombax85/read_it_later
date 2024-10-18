@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeAccordion(); // Aggiungi questa chiamata
     initializePushToTalk();
     initializeCustomPlayPauseButton(); // Aggiungi questa linea
+    initializeChatButton();
 
     const searchInput = document.getElementById('searchInput');
     searchInput.addEventListener('input', function() {
@@ -633,7 +634,6 @@ function sendChatMessage(message) {
 function initializePushToTalk() {
     const pushToTalkButton = document.getElementById('push-to-talk');
     const audioPlayer = document.getElementById('audio-player');
-    const waitingModal = document.getElementById('waiting-modal');
     let isRecording = false;
     let audioChunks = [];
     let mediaRecorder = null;
@@ -713,11 +713,7 @@ function initializePushToTalk() {
         // Aggiungi la cronologia della conversazione al FormData
         formData.append('conversationHistory', JSON.stringify(voiceConversationHistory));
 
-        const waitingModal = document.getElementById('waiting-modal');
-        waitingModal.style.display = 'block';
-
         const timeoutId = setTimeout(() => {
-            waitingModal.style.display = 'none';
             alert('La richiesta sta impiegando più tempo del previsto. Riprova più tardi.');
         }, 30000);
 
@@ -744,7 +740,6 @@ function initializePushToTalk() {
                     })
                     .catch(error => {
                         console.error('Errore nel controllo del file audio:', error);
-                        waitingModal.style.display = 'none';
                         alert('Si è verificato un errore nel caricamento dell\'audio. Riprova.');
                     });
             } else {
@@ -754,22 +749,13 @@ function initializePushToTalk() {
         .catch(error => {
             clearTimeout(timeoutId);
             console.error('Errore nell\'invio dell\'audio:', error);
-            waitingModal.style.display = 'none';
             alert('Si è verificato un errore durante l\'elaborazione dell\'audio. Riprova.');
         });
     }
 
     function playResponse(audioUrl) {
-        const podcastPlayer = document.getElementById('audio-player');
         const responsePlayer = document.getElementById('response-player');
-        const waitingModal = document.getElementById('waiting-modal');
-        
-        const podcastCurrentTime = podcastPlayer.currentTime;
-        const podcastWasPlaying = !podcastPlayer.paused;
-        
-        if (podcastWasPlaying) {
-            podcastPlayer.pause();
-        }
+        const chatPlayButton = document.getElementById('chat-play');
         
         const noCacheAudioUrl = audioUrl + '?t=' + new Date().getTime();
         responsePlayer.src = noCacheAudioUrl;
@@ -778,20 +764,18 @@ function initializePushToTalk() {
         
         responsePlayer.onerror = function() {
             console.error('Errore durante il caricamento dell\'audio:', responsePlayer.error);
-            waitingModal.style.display = 'none';
             alert('Si è verificato un errore durante il caricamento dell\'audio. Riprova.');
         };
         
         responsePlayer.onloadedmetadata = function() {
             console.log('Metadata caricati');
-            waitingModal.style.display = 'none';
         };
         
         responsePlayer.oncanplaythrough = function() {
             console.log('Audio pronto per la riproduzione');
-            waitingModal.style.display = 'none';
             responsePlayer.play().then(() => {
                 console.log('Riproduzione avviata con successo');
+                chatPlayButton.innerHTML = '<i class="fas fa-pause"></i>';
             }).catch(function(error) {
                 console.error('Errore durante la riproduzione dell\'audio:', error);
                 alert('Si è verificato un errore durante la riproduzione dell\'audio. Prova a premere il pulsante play manualmente.');
@@ -800,12 +784,7 @@ function initializePushToTalk() {
         
         responsePlayer.onended = function() {
             console.log('Riproduzione terminata');
-            if (podcastWasPlaying) {
-                podcastPlayer.currentTime = podcastCurrentTime;
-                podcastPlayer.play().catch(function(error) {
-                    console.error('Errore durante la riproduzione del podcast:', error);
-                });
-            }
+            chatPlayButton.innerHTML = '<i class="fas fa-play"></i>';
         };
     }
 }
@@ -851,4 +830,36 @@ function initializeCustomPlayPauseButton() {
 
     // Inizializza lo stato del pulsante al caricamento della pagina
     updatePushToTalkButton();
+}
+
+function initializeChatButton() {
+    const openChatModalButton = document.getElementById('open-chat-modal');
+    const chatBotModal = document.getElementById('chatBotModal');
+    const closeChatModalButton = chatBotModal.querySelector('.close');
+    const chatPlayButton = document.getElementById('chat-play');
+
+    openChatModalButton.addEventListener('click', function() {
+        chatBotModal.style.display = 'block';
+    });
+
+    closeChatModalButton.addEventListener('click', function() {
+        chatBotModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', function(event) {
+        if (event.target == chatBotModal) {
+            chatBotModal.style.display = 'none';
+        }
+    });
+
+    chatPlayButton.addEventListener('click', function() {
+        const responsePlayer = document.getElementById('response-player');
+        if (responsePlayer.paused) {
+            responsePlayer.play();
+            chatPlayButton.innerHTML = '<i class="fas fa-pause"></i>';
+        } else {
+            responsePlayer.pause();
+            chatPlayButton.innerHTML = '<i class="fas fa-play"></i>';
+        }
+    });
 }

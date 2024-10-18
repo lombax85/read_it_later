@@ -47,8 +47,8 @@
                         <button id="custom-play-pause" class="custom-button">
                             <i class="fas fa-play"></i>
                         </button>
-                        <button id="push-to-talk" class="push-to-talk-button custom-button">
-                            <i class="fas fa-microphone"></i>
+                        <button id="open-chat-modal" class="chat-button custom-button">
+                            <i class="fas fa-comment-dots"></i>
                         </button>
                     </div>
                 </div>
@@ -158,6 +158,25 @@
         <div class="modal-content">
             <p>Elaborazione in corso...</p>
             <div class="spinner"></div>
+        </div>
+    </div>
+
+    <div id="chatBotModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Chat con il Bot</h2>
+            <div class="chat-controls">
+                <button id="chat-play" class="custom-button">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button id="push-to-talk" class="push-to-talk-button custom-button">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <audio id="response-player" controls style="width: 100%; margin-top: 10px;">
+                Il tuo browser non supporta l'elemento audio.
+            </audio>
+            <!-- Aggiungi qui il contenuto della chat in futuro -->
         </div>
     </div>
 
