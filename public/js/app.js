@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     changePodcast();
     initializeAccordion(); // Aggiungi questa chiamata
     initializePushToTalk();
+    initializeCustomPlayPauseButton(); // Aggiungi questa linea
 
     const searchInput = document.getElementById('searchInput');
     searchInput.addEventListener('input', function() {
@@ -809,4 +810,28 @@ function initializePushToTalk() {
             }
         };
     }
+}
+
+// Aggiungi questa funzione dopo la funzione initializePushToTalk()
+function initializeCustomPlayPauseButton() {
+    const audioPlayer = document.getElementById('audio-player');
+    const customPlayPauseButton = document.getElementById('custom-play-pause');
+
+    customPlayPauseButton.addEventListener('click', function() {
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+            customPlayPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
+        } else {
+            audioPlayer.pause();
+            customPlayPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+        }
+    });
+
+    audioPlayer.addEventListener('play', function() {
+        customPlayPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
+    });
+
+    audioPlayer.addEventListener('pause', function() {
+        customPlayPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+    });
 }

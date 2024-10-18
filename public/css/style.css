@@ -426,23 +426,28 @@ h1 del + span {
 
 .player-controls {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    width: 100%;
+    gap: 10px;
+    margin-top: 15px;
 }
 
 #audio-player {
-    flex-grow: 1;
-    width: calc(100% - 70px); /* Sottrai la larghezza del pulsante push-to-talk più un po' di spazio */
-    margin-right: 10px;
+    width: 100%;
+    margin-bottom: 10px;
 }
 
-.push-to-talk-button {
+.custom-buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.custom-button {
     width: 60px;
     height: 60px;
-    flex-shrink: 0;
     border-radius: 50%;
-    background-color: #4CAF50;
     border: none;
     color: white;
     font-size: 24px;
@@ -451,6 +456,26 @@ h1 del + span {
     align-items: center;
     justify-content: center;
     transition: background-color 0.3s;
+}
+
+#custom-play-pause {
+    background-color: #4CAF50;
+}
+
+#custom-play-pause:hover {
+    background-color: #45a049;
+}
+
+.push-to-talk-button {
+    background-color: #4CAF50;
+}
+
+.push-to-talk-button:hover {
+    background-color: #45a049;
+}
+
+.push-to-talk-button.recording {
+    background-color: #ff4d4d;
 }
 
 /* Stile personalizzato per il player audio */
@@ -1115,11 +1140,10 @@ html, body {
     margin-right: 15px;
 }
 
-.push-to-talk-button {
+.custom-button {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background-color: #4CAF50;
     border: none;
     color: white;
     font-size: 24px;
@@ -1128,6 +1152,19 @@ html, body {
     align-items: center;
     justify-content: center;
     transition: background-color 0.3s;
+}
+
+#custom-play-pause {
+    background-color: #4CAF50;
+    margin-right: 10px;
+}
+
+#custom-play-pause:hover {
+    background-color: #45a049;
+}
+
+.push-to-talk-button {
+    background-color: #4CAF50;
 }
 
 .push-to-talk-button:hover {
