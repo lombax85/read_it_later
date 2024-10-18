@@ -107,12 +107,14 @@ h1 del + span {
     text-decoration: none;
     display: inline-flex;
     align-items: center;
+    justify-content: center; /* Aggiunto per centrare il contenuto */
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
     border-radius: 25px;
     transition: background-color 0.3s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    min-width: 200px; /* Aggiunto per garantire una larghezza minima */
 }
 
 .add-link-button:hover {
@@ -1320,4 +1322,27 @@ html, body {
 
 #audio-player, #response-player {
     width: 100%;
+}
+
+/* Modifica per la casella di ricerca */
+.search-container input[type="text"] {
+    width: 100%;
+    padding: 10px 15px; /* Aumentato il padding orizzontale */
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Media query per dispositivi mobili */
+@media screen and (max-width: 768px) {
+    .add-link-button {
+        padding: 12px 24px; /* Ridotto leggermente il padding su mobile */
+        font-size: 14px; /* Ridotto leggermente la dimensione del font su mobile */
+    }
+
+    .add-link-button i {
+        margin-right: 8px; /* Ridotto leggermente il margine dell'icona su mobile */
+    }
 }
