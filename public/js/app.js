@@ -646,18 +646,18 @@ function initializePushToTalk() {
         } else {
             try {
 
-                // check if audioplayer is playing
-                // this is a trick for ios. iOS permits autoplay only after a button press.
-                // however, during the button press we wan't to do two things: pause the podcast on the main player, and start recording
-                // so we need to check if the podcast is playing and if it is, we need to stop it and simulate a new click on the pushToTalkButton
-                // otherwise, iOS thinks that the click is for the pause and not for the recording
-                console.log('Checking if audioPlayer is playing');
-                if (!audioPlayer.paused) {
-                    console.log('AudioPlayer is playing, stopping it');
-                    audioPlayer.pause();
-                    // simulate a new click on the pushToTalkButton
-                    pushToTalkButton.click();
-                }
+                // // check if audioplayer is playing
+                // // this is a trick for ios. iOS permits autoplay only after a button press.
+                // // however, during the button press we wan't to do two things: pause the podcast on the main player, and start recording
+                // // so we need to check if the podcast is playing and if it is, we need to stop it and simulate a new click on the pushToTalkButton
+                // // otherwise, iOS thinks that the click is for the pause and not for the recording
+                // console.log('Checking if audioPlayer is playing');
+                // if (!audioPlayer.paused) {
+                //     console.log('AudioPlayer is playing, stopping it');
+                //     audioPlayer.pause();
+                //     // simulate a new click on the pushToTalkButton
+                //     pushToTalkButton.click();
+                // }
 
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 startRecording(stream);
