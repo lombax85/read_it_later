@@ -643,69 +643,60 @@ function initializePushToTalk() {
         if (isRecording) {
             stopRecording();
         } else {
-            await startRecording();
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                startRecording(stream);
+            } catch (error) {
+                console.error('Errore nell\'accesso al microfono:', error);
+                alert("Per utilizzare la funzione di registrazione vocale, è necessario concedere l'autorizzazione all'uso del microfono.");
+            }
         }
     }
 
-    async function startRecording() {
-        if (isRecording) return;
-        isRecording = true;
-        audioChunks = [];
+    function startRecording(stream) {
+        mediaRecorder = new MediaRecorder(stream);
 
-        if (!audioPlayer.paused) {
-            audioPlayer.pause();
-        }
-
-        pushToTalkButton.classList.add('recording');
-        pushToTalkButton.innerHTML = '<i class="fas fa-stop"></i>';
-
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-
-            mediaRecorder.addEventListener('dataavailable', event => {
+        mediaRecorder.ondataavailable = event => {
+            if (event.data.size > 0) {
                 audioChunks.push(event.data);
-            });
+            }
+        };
 
-            mediaRecorder.start();
-        } catch (error) {
-            console.error('Errore nell\'avvio della registrazione:', error);
-            resetRecordingState();
-        }
-    }
+        mediaRecorder.onstart = () => {
+            console.log('MediaRecorder started', mediaRecorder.state);
+            isRecording = true;
+            pushToTalkButton.classList.add('recording');
+            pushToTalkButton.innerHTML = '<i class="fas fa-stop"></i>';
+            audioChunks = [];
+        };
 
-    function stopRecording() {
-        if (!isRecording || !mediaRecorder) return;
-        
-        mediaRecorder.stop();
-        isRecording = false;
+        mediaRecorder.onstop = () => {
+            console.log('MediaRecorder stopped', mediaRecorder.state);
+            isRecording = false;
+            pushToTalkButton.classList.remove('recording');
+            pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
 
-        pushToTalkButton.classList.remove('recording');
-        pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
-
-        mediaRecorder.addEventListener('stop', () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const audioBlob = new Blob(audioChunks, { type: 'audio/mp4' });
+            console.log('Audio Blob size:', audioBlob.size);
             if (audioBlob.size > 0) {
+                const audioURL = URL.createObjectURL(audioBlob);
+                console.log('Audio URL created:', audioURL);
                 sendAudioToServer(audioBlob);
             } else {
                 console.error('Nessun audio registrato');
-                resetRecordingState();
+                alert('Nessun audio registrato. Assicurati che il microfono sia funzionante e che l\'autorizzazione sia stata concessa.');
             }
-        }, { once: true });
+        };
+
+        mediaRecorder.start(1000); // Registra in chunk di 1 secondo
     }
 
-    function resetRecordingState() {
-        isRecording = false;
-        audioChunks = [];
+    function stopRecording() {
         if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            console.log('Stopping MediaRecorder');
             mediaRecorder.stop();
-        }
-        if (mediaRecorder && mediaRecorder.stream) {
             mediaRecorder.stream.getTracks().forEach(track => track.stop());
         }
-        mediaRecorder = null;
-        pushToTalkButton.classList.remove('recording');
-        pushToTalkButton.innerHTML = '<i class="fas fa-microphone"></i>';
     }
 
     function sendAudioToServer(audioBlob) {
