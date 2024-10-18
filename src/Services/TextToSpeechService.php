@@ -19,7 +19,7 @@ class TextToSpeechService {
         $response = $this->client->audio()->speech([
             'model' => 'tts-1',
             'input' => $text,
-            'voice' => 'alloy'
+            'voice' => $this->getVoiceForLanguage('italiano') // TODO: fix
         ]);
 
         $filename = 'response_' . time() . '.mp3';
@@ -27,5 +27,22 @@ class TextToSpeechService {
         file_put_contents($filePath, $response);
 
         return '/temp/' . $filename;
+    }
+
+    private function getVoiceForLanguage($language) {
+        switch ($language) {
+            case 'inglese':
+                return 'alloy';
+            case 'italiano':
+                return 'nova';
+            case 'francese':
+                return 'lea';
+            case 'spagnolo':
+                return 'bella';
+            case 'tedesco':
+                return 'onyx';
+            default:
+                return 'alloy';
+        }
     }
 }
