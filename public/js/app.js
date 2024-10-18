@@ -852,9 +852,14 @@ function initializeChatButton() {
     const closeChatModalButton = chatBotModal.querySelector('.close');
     const chatPlayButton = document.getElementById('chat-play');
     const responsePlayer = document.getElementById('response-player');
+    const mainAudioPlayer = document.getElementById('audio-player');
+    const customPlayPauseButton = document.getElementById('custom-play-pause');
 
     openChatModalButton.addEventListener('click', function() {
         chatBotModal.style.display = 'block';
+        // Metti in pausa il player principale
+        mainAudioPlayer.pause();
+        customPlayPauseButton.innerHTML = '<i class="fas fa-play"></i>';
     });
 
     closeChatModalButton.addEventListener('click', function() {

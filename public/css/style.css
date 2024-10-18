@@ -1404,3 +1404,160 @@ html, body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Aggiungi questi stili alla fine del file */
+.custom-button,
+.push-to-talk-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 50%;  /* Assicura che il pulsante sia perfettamente rotondo */
+    width: 80px;  /* Aumentato da 40px a 80px */
+    height: 80px; /* Aumentato da 40px a 80px */
+    padding: 0;  /* Rimuovi il padding */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none; /* Aggiungi questa linea */
+    background-clip: padding-box; /* Aggiungi questa linea */
+}
+
+.custom-button i,
+.push-to-talk-button i {
+    font-size: 36px;  /* Aumentato da 18px a 36px */
+}
+
+/* Stile specifico per iOS */
+@supports (-webkit-touch-callout: none) {
+    .custom-button,
+    .push-to-talk-button {
+        border-radius: 50%;
+        overflow: hidden;
+    }
+}
+
+/* Modifica questi stili esistenti */
+.custom-button,
+.push-to-talk-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 50%;
+    width: 80px;  /* Aumentato da 40px a 80px */
+    height: 80px; /* Aumentato da 40px a 80px */
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background-clip: padding-box;
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-button i,
+.push-to-talk-button i {
+    font-size: 36px;  /* Aumentato da 18px a 36px */
+    position: relative;
+    z-index: 2;
+}
+
+.custom-button::after,
+.push-to-talk-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    border-radius: 50%;
+}
+
+/* Stili specifici per la modale e per schermi stretti */
+@media screen and (max-width: 768px) {
+    #chatBotModal .custom-button,
+    #chatBotModal .push-to-talk-button {
+        width: 80px;  /* Mantenuto a 80px anche su schermi stretti */
+        height: 80px; /* Mantenuto a 80px anche su schermi stretti */
+    }
+
+    #chatBotModal .custom-button i,
+    #chatBotModal .push-to-talk-button i {
+        font-size: 36px;  /* Mantenuto a 36px anche su schermi stretti */
+    }
+}
+
+/* Stile specifico per iOS */
+@supports (-webkit-touch-callout: none) {
+    .custom-button,
+    .push-to-talk-button,
+    #chatBotModal .custom-button,
+    #chatBotModal .push-to-talk-button {
+        border-radius: 50%;
+        -webkit-mask-image: -webkit-radial-gradient(white, black);
+    }
+}
+
+/* Assicurati che le icone siano sempre visibili */
+.custom-button i,
+.push-to-talk-button i,
+#chatBotModal .custom-button i,
+#chatBotModal .push-to-talk-button i {
+    display: inline-block !important;
+    vertical-align: middle;
+}
+
+/* Aggiorna gli stili per schermi stretti */
+@media screen and (max-width: 768px) {
+    #chatBotModal .custom-button,
+    #chatBotModal .push-to-talk-button,
+    .custom-button,
+    .push-to-talk-button {
+        width: 80px;  /* Mantenuto a 80px anche su schermi stretti */
+        height: 80px; /* Mantenuto a 80px anche su schermi stretti */
+    }
+
+    #chatBotModal .custom-button i,
+    #chatBotModal .push-to-talk-button i,
+    .custom-button i,
+    .push-to-talk-button i {
+        font-size: 36px;  /* Mantenuto a 36px anche su schermi stretti */
+    }
+}
+
+/* Aggiorna gli stili per la chat-button */
+.chat-button {
+    background-color: #3498db;
+    margin-left: 20px;  /* Aumentato da 10px a 20px per dare più spazio */
+}
+
+/* Aggiorna gli stili per il pulsante di riproduzione nella chat */
+#chat-play {
+    background-color: #4CAF50;
+    margin-right: 20px;  /* Aumentato da 10px a 20px per dare più spazio */
+}
+
+/* Aggiorna la spaziatura nella sezione dei controlli della chat */
+.chat-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;  /* Aumentato da 15px a 30px per dare più spazio verticale */
+}
+
+/* Aggiorna la spaziatura nella sezione dei controlli del player */
+.player-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;  /* Aumentato da 10px a 20px per dare più spazio tra gli elementi */
+}
+
+/* Assicurati che ci sia spazio sufficiente per i pulsanti più grandi */
+.custom-buttons-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;  /* Aggiunto per dare spazio sopra i pulsanti */
+}
