@@ -1561,3 +1561,29 @@ html, body {
     align-items: center;
     margin-top: 20px;  /* Aggiunto per dare spazio sopra i pulsanti */
 }
+
+/* Modifica gli stili esistenti per .link-actions */
+.link-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+    margin-top: 15px;
+}
+
+.link-actions button {
+    flex: 1 1 calc(50% - 5px); /* Imposta la larghezza al 50% meno metà del gap */
+    min-width: 120px; /* Imposta una larghezza minima per i pulsanti */
+    padding: 8px 12px;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Media query per schermi molto stretti */
+@media screen and (max-width: 480px) {
+    .link-actions button {
+        flex: 1 1 100%; /* Su schermi molto stretti, i pulsanti occupano l'intera larghezza */
+    }
+}
