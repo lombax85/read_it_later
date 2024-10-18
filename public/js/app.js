@@ -656,6 +656,7 @@ function initializePushToTalk() {
 
     function startRecording(stream) {
         const responsePlayer = document.getElementById('response-player');
+        const chatSpinner = document.getElementById('chat-spinner');
 
         mediaRecorder = new MediaRecorder(stream);
 
@@ -668,6 +669,7 @@ function initializePushToTalk() {
         mediaRecorder.onstart = () => {
             console.log('MediaRecorder started', mediaRecorder.state);
             isRecording = true;
+            chatSpinner.style.display = 'block';
             pushToTalkButton.classList.add('recording');
             pushToTalkButton.innerHTML = '<i class="fas fa-stop"></i>';
             audioChunks = [];
@@ -758,6 +760,9 @@ function initializePushToTalk() {
         const chatPlayButton = document.getElementById('chat-play');
         const chatSpinner = document.getElementById('chat-spinner');
         
+        // Mostra lo spinner
+        chatSpinner.style.display = 'block';
+        
         const noCacheAudioUrl = audioUrl + '?t=' + new Date().getTime();
         responsePlayer.src = noCacheAudioUrl;
         
@@ -773,18 +778,19 @@ function initializePushToTalk() {
         responsePlayer.onloadedmetadata = function() {
             console.log('Metadata dell\'audio caricati');
             chatSpinner.style.display = 'none';
-            chatPlayButton.disabled = false;  // Abilita il pulsante qui
+            chatPlayButton.disabled = false;
         };
         
         responsePlayer.oncanplaythrough = function() {
             console.log('Audio pronto per la riproduzione');
-            chatPlayButton.disabled = false;  // Assicurati che il pulsante sia abilitato anche qui
+            chatSpinner.style.display = 'none';
+            chatPlayButton.disabled = false;
             responsePlayer.play().then(() => {
                 console.log('Riproduzione avviata con successo');
                 chatPlayButton.innerHTML = '<i class="fas fa-pause"></i>';
             }).catch(function(error) {
                 console.error('Errore durante la riproduzione dell\'audio:', error);
-                chatPlayButton.disabled = false;  // Abilita il pulsante in caso di errore
+                chatPlayButton.disabled = false;
                 alert('Si è verificato un errore durante la riproduzione dell\'audio. Prova a premere il pulsante play manualmente.');
             });
         };
@@ -792,7 +798,7 @@ function initializePushToTalk() {
         responsePlayer.onended = function() {
             console.log('Riproduzione terminata');
             chatPlayButton.innerHTML = '<i class="fas fa-play"></i>';
-            chatPlayButton.disabled = false;  // Assicurati che il pulsante rimanga abilitato dopo la fine della riproduzione
+            chatPlayButton.disabled = false;
         };
     }
 }
