@@ -426,10 +426,10 @@ h1 del + span {
 
 .player-controls {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
     margin-top: 15px;
+    gap: 10px;
 }
 
 #audio-player {
@@ -441,7 +441,6 @@ h1 del + span {
     display: flex;
     justify-content: center;
     gap: 10px;
-    width: 100%;
 }
 
 .custom-button {
@@ -456,26 +455,30 @@ h1 del + span {
     align-items: center;
     justify-content: center;
     transition: background-color 0.3s;
-}
-
-#custom-play-pause {
     background-color: #4CAF50;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
-#custom-play-pause:hover {
-    background-color: #45a049;
-}
-
-.push-to-talk-button {
-    background-color: #4CAF50;
-}
-
+#custom-play-pause:hover,
 .push-to-talk-button:hover {
     background-color: #45a049;
 }
 
 .push-to-talk-button.recording {
     background-color: #ff4d4d;
+}
+
+/* Aggiungi questi stili per migliorare l'aspetto su iOS */
+.custom-button:active {
+    opacity: 0.8;
+}
+
+@supports (-webkit-touch-callout: none) {
+    .custom-button {
+        padding: 0;
+    }
 }
 
 /* Stile personalizzato per il player audio */
