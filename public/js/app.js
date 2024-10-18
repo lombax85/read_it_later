@@ -668,6 +668,7 @@ function initializePushToTalk() {
         };
 
         mediaRecorder.onstart = () => {
+            audioPlayer.pause();
             console.log('MediaRecorder started', mediaRecorder.state);
             isRecording = true;
             pushToTalkButton.classList.add('recording');
