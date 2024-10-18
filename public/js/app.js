@@ -645,20 +645,6 @@ function initializePushToTalk() {
             stopRecording();
         } else {
             try {
-
-                // // check if audioplayer is playing
-                // // this is a trick for ios. iOS permits autoplay only after a button press.
-                // // however, during the button press we wan't to do two things: pause the podcast on the main player, and start recording
-                // // so we need to check if the podcast is playing and if it is, we need to stop it and simulate a new click on the pushToTalkButton
-                // // otherwise, iOS thinks that the click is for the pause and not for the recording
-                // console.log('Checking if audioPlayer is playing');
-                // if (!audioPlayer.paused) {
-                //     console.log('AudioPlayer is playing, stopping it');
-                //     audioPlayer.pause();
-                //     // simulate a new click on the pushToTalkButton
-                //     pushToTalkButton.click();
-                // }
-
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 startRecording(stream);
             } catch (error) {
@@ -685,13 +671,6 @@ function initializePushToTalk() {
             pushToTalkButton.classList.add('recording');
             pushToTalkButton.innerHTML = '<i class="fas fa-stop"></i>';
             audioChunks = [];
-
-            // responsePlayer.play().then(() => {
-            //     responsePlayer.pause();
-
-            // }).catch(function(error) {
-            //     console.error('Errore in avvio e stop subito:', error);
-            // });
         };
 
         mediaRecorder.onstop = () => {
@@ -835,6 +814,17 @@ function initializePushToTalk() {
 function initializeCustomPlayPauseButton() {
     const audioPlayer = document.getElementById('audio-player');
     const customPlayPauseButton = document.getElementById('custom-play-pause');
+    const pushToTalkButton = document.getElementById('push-to-talk');
+
+    function updatePushToTalkButton() {
+        if (!audioPlayer.paused) {
+            pushToTalkButton.disabled = true;
+            pushToTalkButton.classList.add('disabled');
+        } else {
+            pushToTalkButton.disabled = false;
+            pushToTalkButton.classList.remove('disabled');
+        }
+    }
 
     customPlayPauseButton.addEventListener('click', function() {
         if (audioPlayer.paused) {
@@ -844,13 +834,21 @@ function initializeCustomPlayPauseButton() {
             audioPlayer.pause();
             customPlayPauseButton.innerHTML = '<i class="fas fa-play"></i>';
         }
+        updatePushToTalkButton();
     });
 
     audioPlayer.addEventListener('play', function() {
         customPlayPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
+        updatePushToTalkButton();
     });
 
     audioPlayer.addEventListener('pause', function() {
         customPlayPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+        updatePushToTalkButton();
     });
+
+    audioPlayer.addEventListener('ended', updatePushToTalkButton);
+
+    // Inizializza lo stato del pulsante al caricamento della pagina
+    updatePushToTalkButton();
 }

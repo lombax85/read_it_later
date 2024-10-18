@@ -1170,10 +1170,27 @@ html, body {
 
 .push-to-talk-button {
     background-color: #4CAF50;
+    color: white;
+    border: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, opacity 0.3s;
 }
 
-.push-to-talk-button:hover {
+.push-to-talk-button:hover:not(:disabled) {
     background-color: #45a049;
+}
+
+.push-to-talk-button:disabled {
+    background-color: #cccccc !important;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .push-to-talk-button.recording {
@@ -1345,4 +1362,14 @@ html, body {
     .add-link-button i {
         margin-right: 8px; /* Ridotto leggermente il margine dell'icona su mobile */
     }
+}
+
+.push-to-talk-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.push-to-talk-button:disabled:hover {
+    background-color: #cccccc;
 }
