@@ -494,12 +494,6 @@ function updatePodcastList(podcasts) {
     const podcastSection = document.getElementById('podcast-section');
     const audioPlayer = document.getElementById('audio-player');
     
-    // Rimuovi il vecchio pulsante di eliminazione se esiste
-    const oldDeleteButton = document.getElementById('delete-podcast-button');
-    if (oldDeleteButton) {
-        oldDeleteButton.remove();
-    }
-    
     if (podcasts.length > 0) {
         podcastSection.style.display = 'block';
         podcastSelect.innerHTML = '<option value="">Seleziona un podcast</option>';
@@ -516,13 +510,6 @@ function updatePodcastList(podcasts) {
         podcastSelect.value = podcasts[podcasts.length - 1].url;
         audioPlayer.src = podcastSelect.value;
 
-        // Aggiungi il pulsante di eliminazione
-        const deleteButton = document.createElement('button');
-        deleteButton.id = 'delete-podcast-button';
-        deleteButton.className = 'delete-podcast-button';
-        deleteButton.textContent = 'Elimina podcast';
-        deleteButton.onclick = deletePodcast;
-        podcastSelect.parentNode.insertBefore(deleteButton, podcastSelect.nextSibling);
     } else {
         podcastSection.style.display = 'none';
         audioPlayer.src = '';
@@ -532,23 +519,27 @@ function updatePodcastList(podcasts) {
 function deletePodcast() {
     const podcastSelect = document.getElementById('podcast-select');
     const selectedPodcast = podcastSelect.value;
+    
+    if (!selectedPodcast) {
+        alert('Seleziona un podcast da eliminare');
+        return;
+    }
 
-    if (selectedPodcast && confirm('Sei sicuro di voler eliminare questo podcast?')) {
-        const filename = selectedPodcast.split('/').pop();
-
-        fetch(`./api/podcasts/${filename}`, {
-            method: 'DELETE',
+    if (confirm('Sei sicuro di voler eliminare questo podcast?')) {
+        fetch(`./api${selectedPodcast}`, {
+            method: 'DELETE'
         })
         .then(response => {
             if (response.ok) {
                 alert('Podcast eliminato con successo');
                 fetchPodcasts(); // Aggiorna la lista dei podcast
+                document.getElementById('audio-player').src = ''; // Resetta il player audio
             } else {
-                throw new Error('Errore nell\'eliminazione del podcast');
+                alert('Errore durante l\'eliminazione del podcast');
             }
         })
         .catch(error => {
-            console.error('Errore nell\'eliminazione del podcast:', error);
+            console.error('Errore:', error);
             alert('Si è verificato un errore durante l\'eliminazione del podcast');
         });
     }

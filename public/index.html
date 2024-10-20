@@ -44,9 +44,14 @@
         <div id="podcast-section" style="display: none;">
             <div id="podcast-player">
                 <h2>Ascolta il Podcast</h2>
-                <select id="podcast-select" onchange="changePodcast()">
-                    <option value="">Seleziona un podcast</option>
-                </select>
+                <div class="podcast-controls">
+                    <select id="podcast-select" onchange="changePodcast()">
+                        <option value="">Seleziona un podcast</option>
+                    </select>
+                    <button id="delete-podcast" class="delete-podcast-button" onclick="deletePodcast()">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
                 <div class="player-controls">
                     <audio id="audio-player" controls>
                         Il tuo browser non supporta l'elemento audio.

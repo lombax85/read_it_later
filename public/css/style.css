@@ -1652,3 +1652,38 @@ html, body {
     color: #ffd700;
 }
 
+.podcast-controls {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+#podcast-select {
+    flex-grow: 1;
+    margin-right: 10px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.delete-podcast-button {
+    background-color: transparent;
+    color: #e74c3c;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-podcast-button:hover {
+    color: #c0392b;
+}
+
+.delete-podcast-button i {
+    font-size: 18px;
+}
