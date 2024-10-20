@@ -25,6 +25,7 @@ let chatMemory = {};
 let mediaRecorder;
 let audioChunks = [];
 let voiceConversationHistory = [];
+let readTimeout = null;
 
 function fetchLinks() {
     fetch('./api/links')
@@ -201,7 +202,9 @@ function generateOrShowSummary(id, url, isRead) {
             if (data.summary) {
                 showSummaryInAccordion(id, data.summary);
                 if (!isRead) {
-                    markLinkAsRead(id);
+                    readTimeout = setTimeout(() => {
+                        markLinkAsRead(id);
+                    }, 10000);
                 }
             } else {
                 generateAndSaveSummary(id, url);
@@ -247,12 +250,18 @@ function showSummaryInAccordion(id, summary) {
     const content = accordionItem.querySelector('.accordion-content');
     accordionItem.classList.add('active');
     content.style.maxHeight = content.scrollHeight + 'px';
+
 }
 
 function toggleAccordion(id) {
     const item = document.getElementById(`accordion-item-${id}`);
     const content = item.querySelector('.accordion-content');
     const allItems = document.querySelectorAll('.accordion-item');
+
+    // Cancella il timer di lettura
+    if (readTimeout) {
+        clearTimeout(readTimeout);
+    }
     
     // Chiudi tutti gli altri accordion
     allItems.forEach(otherItem => {
