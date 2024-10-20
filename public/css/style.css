@@ -307,7 +307,7 @@ h1 del + span {
 #loadingIcon {
     position: fixed;
     top: 2%;
-    left: 80%;
+    left: 70%;
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
     padding: 20px;
