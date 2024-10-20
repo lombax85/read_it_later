@@ -36,7 +36,7 @@ class ChatService {
         $response = $this->client->chat()->create([
             'model' => 'gpt-4o-mini',
             'messages' => $messages,
-            'max_tokens' => 150,
+            'max_tokens' => 500,
             'temperature' => 0.7,
         ]);
 
@@ -75,7 +75,7 @@ class ChatService {
         $response = $this->client->chat()->create([
             'model' => 'gpt-4o-mini',
             'messages' => $messages,
-            'max_tokens' => 300,
+            'max_tokens' => 500,
             'temperature' => 0.7,
         ]);
 
