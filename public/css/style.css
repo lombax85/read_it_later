@@ -1572,18 +1572,17 @@ html, body {
 }
 
 .link-actions button {
-    flex: 1 1 calc(50% - 5px); /* Imposta la larghezza al 50% meno metà del gap */
-    min-width: 120px; /* Imposta una larghezza minima per i pulsanti */
+    flex: 1 1 20%; /* 4 pulsanti per riga su schermi larghi */
+    min-width: 100px;
     padding: 8px 12px;
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
-/* Media query per schermi molto stretti */
-@media screen and (max-width: 480px) {
+/* Media query per schermi più stretti */
+@media screen and (max-width: 768px) {
     .link-actions button {
-        flex: 1 1 100%; /* Su schermi molto stretti, i pulsanti occupano l'intera larghezza */
+        flex: 1 1 100%; /* Un pulsante per riga */
     }
 }
