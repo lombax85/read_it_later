@@ -116,5 +116,19 @@ class Database
         if (!$isReadExists) {
             $this->connection->exec("ALTER TABLE links ADD COLUMN is_read INTEGER DEFAULT 0");
         }
+
+        // Aggiungi la colonna ranking se non esiste già
+        $result = $this->connection->query("PRAGMA table_info(links)");
+        $columns = $result->fetchAll(PDO::FETCH_ASSOC);
+        $rankingExists = false;
+        foreach ($columns as $column) {
+            if ($column['name'] === 'ranking') {
+                $rankingExists = true;
+                break;
+            }
+        }
+        if (!$rankingExists) {
+            $this->connection->exec("ALTER TABLE links ADD COLUMN ranking INTEGER DEFAULT 0");
+        }
     }
 }

@@ -3,18 +3,40 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchPodcasts();
     handleResize();
     changePodcast();
-    initializeAccordion(); // Aggiungi questa chiamata
+    initializeAccordion();
     initializePushToTalk();
-    initializeCustomPlayPauseButton(); // Aggiungi questa linea
+    initializeCustomPlayPauseButton();
     initializeChatButton();
 
     const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', function() {
-        filterLinks(this.value);
+    const starFilterOptions = document.querySelectorAll('.star-filter-option');
+    const starFilterLabel = document.getElementById('star-filter-label');
+
+    searchInput.addEventListener('input', filterLinks);
+    starFilterOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const value = parseInt(this.dataset.value);
+            starFilterOptions.forEach(opt => {
+                if (parseInt(opt.dataset.value) <= value) {
+                    opt.classList.add('active');
+                } else {
+                    opt.classList.remove('active');
+                }
+            });
+            filterLinks();
+        });
+    });
+
+    starFilterLabel.addEventListener('click', function() {
+        starFilterOptions.forEach(opt => opt.classList.remove('active'));
+        filterLinks();
     });
 
     const chatForm = document.getElementById('chatForm');
     chatForm.addEventListener('submit', handleChatSubmit);
+
+    // Rimuovi questa riga duplicata
+    // const starFilterOptions = document.querySelectorAll('.star-filter-option');
 });
 
 let selectedLinks = [];
@@ -33,11 +55,23 @@ function fetchLinks() {
         .then(links => {
             console.log('Links received from backend:', links);
             allLinks = links; // Salva tutti i link
-            renderLinks(links);
+            filterLinks(); // Usa filterLinks invece di renderLinks direttamente
             updateGeneratePodcastButton();
             initializeReadLinksAccordion();
         })
         .catch(error => console.error('Errore nel recupero dei link:', error));
+}
+
+function filterLinks() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const starRating = document.querySelectorAll('.star-filter-option.active').length;
+
+    const filteredLinks = allLinks.filter(link => 
+        (link.title.toLowerCase().includes(searchTerm) ||
+        link.category.toLowerCase().includes(searchTerm)) &&
+        (starRating === 0 || link.ranking >= starRating)
+    );
+    renderLinks(filteredLinks);
 }
 
 function renderLinks(links) {
@@ -56,14 +90,6 @@ function renderLinks(links) {
     });
 }
 
-function filterLinks(searchTerm) {
-    const filteredLinks = allLinks.filter(link => 
-        link.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        link.category.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    renderLinks(filteredLinks);
-}
-
 function createLinkElement(link) {
     console.log('Creating element for link:', link);
     const div = document.createElement('div');
@@ -77,6 +103,8 @@ function createLinkElement(link) {
     const createdAt = new Date(link.createdAt);
     const formattedDate = `${createdAt.getDate().toString().padStart(2, '0')}/${(createdAt.getMonth() + 1).toString().padStart(2, '0')}/${createdAt.getFullYear()} ${createdAt.getHours().toString().padStart(2, '0')}:${createdAt.getMinutes().toString().padStart(2, '0')}`;
 
+    const starsHtml = createStarRating(link.id, link.ranking);
+
     div.innerHTML = `
         <div class="link-header">
             <label class="link-checkbox">
@@ -89,6 +117,7 @@ function createLinkElement(link) {
             <span class="link-category">${link.category || 'Categoria non disponibile'}</span>
             <span class="link-date">Aggiunto il: ${formattedDate}</span>
             <a href="${link.url || '#'}" target="_blank" class="link-url">${link.url ? 'Visita il link' : 'URL non disponibile'}</a>
+            <div class="star-rating" data-link-id="${link.id}">${starsHtml}</div>
         </div>
         <div class="link-actions">
             <button onclick="generateOrShowSummary(${link.id}, '${link.url || ''}', ${link.isRead})">
@@ -101,6 +130,39 @@ function createLinkElement(link) {
         <div id="accordion-item-${link.id}" class="accordion-item"></div>
     `;
     return div;
+}
+
+function createStarRating(linkId, currentRanking) {
+    let html = '';
+    for (let i = 1; i <= 3; i++) {
+        html += `<span class="${i <= currentRanking ? 'active' : ''}" onclick="updateRanking(${linkId}, ${i})">☆</span>`;
+    }
+    return html;
+}
+
+function updateRanking(linkId, newRanking) {
+    fetch(`./api/links/${linkId}/ranking`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ranking: newRanking })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const starRating = document.querySelector(`.star-rating[data-link-id="${linkId}"]`);
+            starRating.innerHTML = createStarRating(linkId, newRanking);
+            // Aggiorna il ranking nel array allLinks
+            const linkIndex = allLinks.findIndex(link => link.id === linkId);
+            if (linkIndex !== -1) {
+                allLinks[linkIndex].ranking = newRanking;
+            }
+            // Applica i filtri correnti
+            filterLinks();
+        }
+    })
+    .catch(error => console.error('Errore nell\'aggiornamento del ranking:', error));
 }
 
 function toggleLinkSelection(id, url) {
@@ -908,3 +970,4 @@ function initializeChatButton() {
         chatPlayButton.disabled = false;  // Assicurati che il pulsante rimanga abilitato dopo la fine della riproduzione
     });
 }
+

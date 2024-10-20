@@ -264,6 +264,21 @@ $app->post('/api/process-audio', function ($request, $response) {
     return $response->withStatus(400)->withJson(['error' => 'Errore nel caricamento del file audio o ID del podcast mancante']);
 });
 
+$app->post('/api/links/{id}/ranking', function ($request, $response, $args) {
+    $id = $args['id'];
+    $data = $request->getParsedBody();
+    $newRanking = $data['ranking'];
+
+    $link = Link::getById($id);
+    if ($link) {
+        $link->setRanking($newRanking);
+        $link->save();
+        return $response->withJson(['success' => true]);
+    } else {
+        return $response->withStatus(404)->withJson(['error' => 'Link non trovato']);
+    }
+});
+
 function moveUploadedFile($uploadedFile) {
     $directory = __DIR__ . '/uploads';
     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
@@ -291,3 +306,4 @@ function cleanupTempFiles() {
 
 // Esecuzione dell'applicazione
 $app->run();
+
