@@ -27,8 +27,8 @@ To run this project locally, follow these steps:
 
 1. Clone the repository:
    ```
-   git clone https://github.com/lombax85/read-it-later.git
-   cd read-it-later-never
+   git clone https://github.com/lombax85/read_it_later.git
+   cd read_it_later
    ```
 
 2. Create a `.env` file in the root directory and add your OpenAI API key:
@@ -58,12 +58,10 @@ To run this project locally, follow these steps:
    docker-compose exec app chown -R www-data:www-data *
    ```
 
-8. The application should now be running. Access it in your web browser at:
+8. The application should now be running. Access it in your web browser at (remember accept the self-signed certificate, https is needed for recording working on iOS):
    ```
    https://localhost:8443
    ```
-
-   Note: You may see a warning about the self-signed certificate. This is expected in a development environment and you can safely proceed.
 
 ## Development
 
