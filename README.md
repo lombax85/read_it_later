@@ -27,8 +27,8 @@ To run this project locally, follow these steps:
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/read-it-later.git
-   cd read-it-later
+   git clone https://github.com/lombax85/read-it-later.git
+   cd read-it-later-never
    ```
 
 2. Create a `.env` file in the root directory and add your OpenAI API key:
@@ -60,8 +60,10 @@ To run this project locally, follow these steps:
 
 8. The application should now be running. Access it in your web browser at:
    ```
-   http://localhost:8080
+   https://localhost:8443
    ```
+
+   Note: You may see a warning about the self-signed certificate. This is expected in a development environment and you can safely proceed.
 
 ## Development
 
