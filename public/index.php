@@ -185,7 +185,8 @@ $app->post('/api/summary/{id}', function ($request, $response, $args) {
 });
 
 $app->get('/api/summary/{id}', function ($request, $response, $args) {
-    $link = Link::getById($args['id']);
+    global $globalUserID;
+    $link = Link::getById($args['id'], $globalUserID);
     
     if ($link && $link->getSummary()) {
         return $response->withJson(['summary' => $link->getSummary()]);
@@ -256,8 +257,9 @@ $app->delete('/api/podcasts/{filename}', function ($request, $response, $args) {
 });
 
 $app->post('/api/links/{id}/read', function ($request, $response, $args) {
+    global $globalUserID;
     $id = $args['id'];
-    $link = Link::getById($id);
+    $link = Link::getById($id, $globalUserID);
     
     if ($link) {
         $link->setRead(true);
