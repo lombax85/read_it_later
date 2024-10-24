@@ -355,6 +355,56 @@ $app->post('/api/links/{id}/ranking', function ($request, $response, $args) {
     }
 });
 
+// Aggiungi questa nuova route dopo le altre
+$app->get('/api/stats', function ($request, $response) {
+    global $globalUserID;
+    
+    // Verifica che l'utente sia admin (ID = 1)
+    if ($globalUserID !== 1) {
+        return $response->withStatus(403)->withJson(['error' => 'Accesso non autorizzato']);
+    }
+
+    $queryParams = $request->getQueryParams();
+    $startDate = $queryParams['start'] ?? date('Y-m-d', strtotime('-7 days'));
+    $endDate = $queryParams['end'] ?? date('Y-m-d');
+
+    $db = Database::getInstance()->getConnection();
+    
+    // Query per ottenere le statistiche aggregate
+    $stmt = $db->prepare("
+        SELECT 
+            user_id,
+            endpoint,
+            SUM(tokens_used) as total_tokens
+        FROM openai_logs
+        WHERE DATE(created_at) BETWEEN :start_date AND :end_date
+        GROUP BY user_id, endpoint
+        ORDER BY user_id, endpoint
+    ");
+
+    $stmt->execute([
+        ':start_date' => $startDate,
+        ':end_date' => $endDate
+    ]);
+
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Organizza i dati per utente
+    $stats = [];
+    foreach ($results as $row) {
+        $userId = $row['user_id'];
+        if (!isset($stats[$userId])) {
+            $stats[$userId] = [
+                'user_id' => $userId,
+                'endpoints' => []
+            ];
+        }
+        $stats[$userId]['endpoints'][$row['endpoint']] = (int)$row['total_tokens'];
+    }
+
+    return $response->withJson(array_values($stats));
+});
+
 function moveUploadedFile($uploadedFile) {
     $directory = __DIR__ . '/uploads';
     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);

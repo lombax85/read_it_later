@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <!-- Aggiungiamo la libreria marked per il parsing del markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Aggiungi prima di </head> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <!-- Sposta questo div fuori dal div #app e prima di esso -->
@@ -16,6 +18,11 @@
         <i class="fas fa-spinner fa-spin"></i> Podcast in generazione
     </div>
     
+    <!-- Aggiungi dopo il div #loadingIcon e prima del div #app -->
+    <div id="statsButton" style="display: none;" class="stats-button">
+        <i class="fas fa-chart-bar"></i> Statistiche
+    </div>
+
     <div id="app">
         <h1>Read It <del>Later</del> Never</h1>
         <div class="button-container">
@@ -188,6 +195,26 @@
                 Il tuo browser non supporta l'elemento audio.
             </audio>
             <!-- Aggiungi qui il contenuto della chat in futuro -->
+        </div>
+    </div>
+
+    <!-- Aggiungi prima di </body> -->
+    <div id="statsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Statistiche Utilizzo Token</h2>
+            <div class="date-filters">
+                <div class="date-input">
+                    <label for="startDate">Data Inizio:</label>
+                    <input type="date" id="startDate">
+                </div>
+                <div class="date-input">
+                    <label for="endDate">Data Fine:</label>
+                    <input type="date" id="endDate">
+                </div>
+                <button onclick="fetchStats()">Aggiorna</button>
+            </div>
+            <canvas id="statsChart"></canvas>
         </div>
     </div>
 

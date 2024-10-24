@@ -1687,3 +1687,55 @@ html, body {
 .delete-podcast-button i {
     font-size: 18px;
 }
+
+.stats-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.stats-button:hover {
+    background-color: #45a049;
+}
+
+.date-filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    align-items: flex-end;
+}
+
+.date-input {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.date-input input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.date-filters button {
+    padding: 8px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.date-filters button:hover {
+    background-color: #45a049;
+}

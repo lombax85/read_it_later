@@ -37,6 +37,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Rimuovi questa riga duplicata
     // const starFilterOptions = document.querySelectorAll('.star-filter-option');
+
+    // Mostra il pulsante statistiche solo per l'admin
+    const token = localStorage.getItem('RIN_JWT_TOKEN');
+    if (token) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.sub === 1) { // user_id 1 è l'admin
+            document.getElementById('statsButton').style.display = 'flex';
+        }
+    }
+
+    initializeStatsModal();
 });
 
 let selectedLinks = [];
@@ -990,3 +1001,111 @@ function logout() {
     window.location.href = '/login.html';
 }
 
+// Aggiungi queste nuove funzioni
+let statsChart = null;
+
+function initializeStatsModal() {
+    const modal = document.getElementById('statsModal');
+    const btn = document.getElementById('statsButton');
+    const span = modal.querySelector('.close');
+
+    // Imposta le date di default (ultima settimana)
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 7);
+
+    document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+    document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+
+    btn.onclick = function() {
+        modal.style.display = "block";
+        fetchStats();
+    }
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+}
+
+function fetchStats() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    fetchWithAuth(`/api/stats?start=${startDate}&end=${endDate}`)
+        .then(response => response.json())
+        .then(data => {
+            updateStatsChart(data);
+        })
+        .catch(error => console.error('Errore nel recupero delle statistiche:', error));
+}
+
+function updateStatsChart(data) {
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    
+    if (statsChart) {
+        statsChart.destroy();
+    }
+
+    const datasets = [];
+    const endpoints = [...new Set(data.flatMap(user => 
+        Object.keys(user.endpoints)))];
+
+    endpoints.forEach(endpoint => {
+        datasets.push({
+            label: endpoint,
+            data: data.map(user => user.endpoints[endpoint] || 0),
+            backgroundColor: getRandomColor()
+        });
+    });
+
+    statsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(user => `Utente ${user.user_id}`),
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    stacked: true,
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Token utilizzati'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Utilizzo Token per Utente e Endpoint'
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+// Aggiungi alla fine della funzione document.addEventListener('DOMContentLoaded', function() {
+initializeStatsModal();
