@@ -9,12 +9,13 @@ use GuzzleHttp\Exception\RequestException;
 class LinkCategorizer {
     private $openaiClient;
     private $httpClient;
-
-    public function __construct() {
+    private $owner;
+    public function __construct($owner) {
         $apiKey = $_ENV['OPENAI_API_KEY'] ?? null;
         if (!$apiKey) {
             throw new \Exception('OPENAI_API_KEY non è stata impostata');
-        }
+        }   
+        $this->owner = $owner;
         $this->openaiClient = OpenAI::client($apiKey);
         $this->httpClient = new Client([
             'headers' => [
@@ -35,6 +36,13 @@ class LinkCategorizer {
             'max_tokens' => 50,
             'temperature' => 0.3,
         ]);
+
+        // Log the OpenAI call
+        (new Logger())->logOpenAICall(
+            $this->owner, 
+            'chat/create;LinkCategorizer::categorize', 
+            $response->usage->totalTokens
+        );
 
         $category = trim($response->choices[0]->message->content);
         return $category ?: 'Uncategorized';

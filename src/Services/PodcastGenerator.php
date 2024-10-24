@@ -67,6 +67,13 @@ class PodcastGenerator {
             'temperature' => 0.7,
         ]);
 
+        // Log the OpenAI call
+        (new Logger())->logOpenAICall(
+            $this->owner, 
+            'chat/create;PodcastGenerator::generateScript', 
+            $response->usage->totalTokens
+        );
+
         return $response->choices[0]->message->content;
     }
 
@@ -98,6 +105,13 @@ class PodcastGenerator {
             'temperature' => 0.7,
         ]);
 
+        // Log the OpenAI call
+        (new Logger())->logOpenAICall(
+            $this->owner, 
+            'chat/create;PodcastGenerator::generateTitle', 
+            $response->usage->totalTokens
+        );
+
         return trim($response->choices[0]->message->content);
     }
 
@@ -111,6 +125,13 @@ class PodcastGenerator {
                 'voice' => $this->getVoiceForLanguage($language),
                 'input' => $segment
             ]);
+
+            // Log the OpenAI call
+            (new Logger())->logOpenAICall(
+                $this->owner, 
+                'audio/speech;PodcastGenerator::generateAudio', 
+                $response->usage->totalTokens
+            );
 
             $fileName = "podcast_segment_{$index}.mp3";
             $filePath = __DIR__ . "/../../public/podcasts/{$fileName}";

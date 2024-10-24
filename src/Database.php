@@ -173,5 +173,16 @@ class Database
         if (!$ownerExists) {
             $this->connection->exec("ALTER TABLE podcasts ADD COLUMN owner INTEGER");
         }
+
+        // Migrazione per la tabella openai_logs
+        $this->connection->exec("
+            CREATE TABLE IF NOT EXISTS openai_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                endpoint TEXT NOT NULL,
+                tokens_used INTEGER NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ");
     }
 }

@@ -5,6 +5,7 @@ namespace App\Services;
 use OpenAI;
 use App\Models\Podcast;
 use App\Models\Link;
+use App\Services\Logger;
 
 class ChatService {
     private $client;
@@ -40,6 +41,13 @@ class ChatService {
             'max_tokens' => 500,
             'temperature' => 0.7,
         ]);
+
+        // Log the OpenAI call
+        (new Logger())->logOpenAICall(
+            $this->owner, 
+            'chat/create;ChatService::generateReply', 
+            $response->usage->totalTokens
+        );
 
         return $response->choices[0]->message->content;
     }
@@ -79,6 +87,13 @@ class ChatService {
             'max_tokens' => 500,
             'temperature' => 0.7,
         ]);
+
+        // Log the OpenAI call
+        (new Logger())->logOpenAICall(
+            $this->owner, 
+            'chat/create;ChatService::generatePodcastResponse', 
+            $response->usage->totalTokens
+        );
 
         return $response->choices[0]->message->content;
     }

@@ -6,13 +6,15 @@ use OpenAI;
 
 class SummaryGenerator {
     private $client;
+    private $owner;
 
-    public function __construct() {
+    public function __construct($owner) {
         $apiKey = $_ENV['OPENAI_API_KEY'] ?? null;
         if (!$apiKey) {
             throw new \Exception('OPENAI_API_KEY non è stata impostata');
         }
         $this->client = OpenAI::client($apiKey);
+        $this->owner = $owner;
     }
 
     public function generate($content, $length = 'medio', $language = 'italiano') {
@@ -28,6 +30,13 @@ class SummaryGenerator {
             'max_tokens' => 4096,
             'temperature' => 0.5,
         ]);
+
+        // Log the OpenAI call
+        (new Logger())->logOpenAICall(
+            $this->owner, 
+            'chat/create;SummaryGenerator::generate', 
+            $response->usage->totalTokens
+        );
 
         return $response->choices[0]->message->content;
     }

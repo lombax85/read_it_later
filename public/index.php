@@ -112,12 +112,13 @@ $app->post('/api/links', function ($request, $response) {
 });
 
 $app->post('/api/summary', function ($request, $response) {
+    global $globalUserID;
     $data = $request->getParsedBody();
     $extractor = new ContentExtractor();
     $content = $extractor->extract($data['url']);
     
     if ($content) {
-        $generator = new SummaryGenerator();
+        $generator = new SummaryGenerator($globalUserID);
         $summary = $generator->generate($content['content']);
         return $response->withJson(['summary' => $summary]);
     } else {
@@ -140,11 +141,11 @@ $app->post('/api/add-and-summarize', function ($request, $response) {
     if ($content) {
         try {
             // Genera il riassunto
-            $generator = new SummaryGenerator();
+            $generator = new SummaryGenerator($globalUserID);
             $summary = $generator->generate($content['content'], $summaryLength, $language);
 
             // Categorizza il link
-            $categorizer = new LinkCategorizer();
+            $categorizer = new LinkCategorizer($globalUserID);
             $category = $categorizer->categorize($url, $manualContent);
 
             // Salva il link
@@ -175,7 +176,7 @@ $app->post('/api/summary/{id}', function ($request, $response, $args) {
     $link = Link::getById($args['id'], $globalUserID);
     
     if ($link) {
-        $generator = new SummaryGenerator();
+        $generator = new SummaryGenerator($globalUserID);
         $summary = $generator->generate($data['content']);
         $link->updateSummary($summary);
         return $response->withJson(['summary' => $summary]);
@@ -317,13 +318,13 @@ $app->post('/api/process-audio', function ($request, $response) {
 
     if ($audioFile->getError() === UPLOAD_ERR_OK && $podcastId) {
         $filename = moveUploadedFile($audioFile);
-        $transcriptionService = new TranscriptionService();
+        $transcriptionService = new TranscriptionService($globalUserID);
         $userTranscription = $transcriptionService->transcribe($filename);
 
         $chatService = new ChatService($globalUserID);
         $aiResponse = $chatService->generatePodcastResponse($userTranscription, $podcastId, $conversationHistory);
 
-        $ttsService = new TextToSpeechService();
+        $ttsService = new TextToSpeechService($globalUserID);
         $audioUrl = $ttsService->generateSpeech($aiResponse);
 
         cleanupTempFiles();

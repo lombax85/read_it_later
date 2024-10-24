@@ -6,13 +6,15 @@ use OpenAI;
 
 class TextToSpeechService {
     private $client;
+    private $owner;
 
-    public function __construct() {
+    public function __construct($owner) {
         $apiKey = $_ENV['OPENAI_API_KEY'] ?? null;
         if (!$apiKey) {
             throw new \Exception('OPENAI_API_KEY non è stata impostata');
         }
         $this->client = OpenAI::client($apiKey);
+        $this->owner = $owner;
     }
 
     public function generateSpeech($text) {
@@ -21,6 +23,13 @@ class TextToSpeechService {
             'input' => $text,
             'voice' => $this->getVoiceForLanguage('italiano') // TODO: fix
         ]);
+
+        // Log the OpenAI call
+        (new Logger())->logOpenAICall(
+            $this->owner, 
+            'audio/speech;TextToSpeechService::generateSpeech', 
+            0
+        );
 
         $filename = 'response_' . time() . '.mp3';
         $filePath = __DIR__ . '/../../public/temp/' . $filename;
