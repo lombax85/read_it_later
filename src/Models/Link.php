@@ -16,8 +16,9 @@ class Link implements JsonSerializable {
     private $content;
     private $isRead;
     private $ranking;
+    private $owner;
 
-    public function __construct($url = null, $title = null, $category = null, $content = null, $isRead = false, $ranking = 0) {
+    public function __construct($url = null, $title = null, $category = null, $content = null, $isRead = false, $ranking = 0, $owner = null) {
         $this->url = $url;
         $this->title = $title;
         $this->category = $category;
@@ -25,6 +26,7 @@ class Link implements JsonSerializable {
         $this->createdAt = date('Y-m-d H:i:s');
         $this->isRead = $isRead;
         $this->ranking = $ranking;
+        $this->owner = $owner;
     }
 
     // Getter e setter
@@ -50,21 +52,25 @@ class Link implements JsonSerializable {
     public function getRanking() { return $this->ranking; }
     public function setRanking($ranking) { $this->ranking = $ranking; }
 
+    public function getOwner() { return $this->owner; }
+    public function setOwner($owner) { $this->owner = $owner; }
+
     public function save() {
         $db = Database::getInstance()->getConnection();
         if ($this->id) {
-            $stmt = $db->prepare("UPDATE links SET url = ?, title = ?, category = ?, summary = ?, content = ?, is_read = ?, ranking = ? WHERE id = ?");
-            $stmt->execute([$this->url, $this->title, $this->category, $this->summary, $this->content, $this->isRead ? 1 : 0, $this->ranking, $this->id]);
+            $stmt = $db->prepare("UPDATE links SET url = ?, title = ?, category = ?, summary = ?, content = ?, is_read = ?, ranking = ?, owner = ? WHERE id = ?");
+            $stmt->execute([$this->url, $this->title, $this->category, $this->summary, $this->content, $this->isRead ? 1 : 0, $this->ranking, $this->owner, $this->id]);
         } else {
-            $stmt = $db->prepare("INSERT INTO links (url, title, category, summary, content, created_at, is_read, ranking) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$this->url, $this->title, $this->category, $this->summary, $this->content, $this->createdAt, $this->isRead ? 1 : 0, $this->ranking]);
+            $stmt = $db->prepare("INSERT INTO links (url, title, category, summary, content, created_at, is_read, ranking, owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$this->url, $this->title, $this->category, $this->summary, $this->content, $this->createdAt, $this->isRead ? 1 : 0, $this->ranking, $this->owner]);
             $this->id = $db->lastInsertId();
         }
     }
 
-    public static function getAll() {
+    public static function getAll($owner) {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->query("SELECT * FROM links ORDER BY ranking DESC, created_at DESC");
+        $stmt = $db->prepare("SELECT * FROM links WHERE owner = ? ORDER BY ranking DESC, created_at DESC");
+        $stmt->execute([$owner]);
         $links = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         $linkObjects = [];
@@ -76,16 +82,17 @@ class Link implements JsonSerializable {
             $linkObject->content = $link['content'];
             $linkObject->isRead = $link['is_read'];
             $linkObject->ranking = $link['ranking'];
+            $linkObject->owner = $link['owner'];
             $linkObjects[] = $linkObject;
         }
                 
         return $linkObjects;
     }
 
-    public static function getByCategory($category) {
+    public static function getByCategory($category, $owner) {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT * FROM links WHERE category = ? ORDER BY created_at DESC");
-        $stmt->execute([$category]);
+        $stmt = $db->prepare("SELECT * FROM links WHERE category = ? AND owner = ? ORDER BY created_at DESC");
+        $stmt->execute([$category, $owner]);
         $links = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         $linkObjects = [];
@@ -96,6 +103,7 @@ class Link implements JsonSerializable {
             $linkObject->createdAt = $link['created_at'];
             $linkObject->content = $link['content'];
             $linkObject->isRead = $link['is_read'];
+            $linkObject->owner = $link['owner'];
             $linkObjects[] = $linkObject;
         }
         
@@ -109,10 +117,10 @@ class Link implements JsonSerializable {
         $stmt->execute([$this->summary, $this->id]);
     }
 
-    public static function getById($id) {
+    public static function getById($id, $owner) {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT * FROM links WHERE id = ?");
-        $stmt->execute([$id]);
+        $stmt = $db->prepare("SELECT * FROM links WHERE id = ? AND owner = ?");
+        $stmt->execute([$id, $owner]);
         $link = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($link) {
@@ -123,6 +131,7 @@ class Link implements JsonSerializable {
             $linkObject->content = $link['content'];
             $linkObject->isRead = $link['is_read'];
             $linkObject->ranking = $link['ranking'];
+            $linkObject->owner = $link['owner'];
             return $linkObject;
         }
         
@@ -139,7 +148,8 @@ class Link implements JsonSerializable {
             'content' => $this->content,
             'createdAt' => $this->createdAt,
             'isRead' => $this->isRead,
-            'ranking' => $this->ranking
+            'ranking' => $this->ranking,
+            'owner' => $this->owner
         ];
     }
 

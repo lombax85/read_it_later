@@ -99,14 +99,14 @@ $app->get('/', function ($request, $response) {
 // API routes
 $app->get('/api/links', function ($request, $response) {
     global $globalUserID;
-    error_log('Global user: ' . print_r($globalUserID, true));
-    $links = Link::getAll();
+    $links = Link::getAll($globalUserID);
     return $response->withJson($links);
 });
 
 $app->post('/api/links', function ($request, $response) {
+    global $globalUserID;
     $data = $request->getParsedBody();
-    $link = new Link($data['url'], $data['title'], $data['category']);
+    $link = new Link($data['url'], $data['title'], $data['category'],null, false, 0, $globalUserID);
     $link->save();
     return $response->withJson($link, 201);
 });
@@ -126,6 +126,7 @@ $app->post('/api/summary', function ($request, $response) {
 });
 
 $app->post('/api/add-and-summarize', function ($request, $response) {
+    global $globalUserID;
     $data = $request->getParsedBody();
     $url = $data['url'];
     $summaryLength = $data['summaryLength'] ?? 'medio';
@@ -147,7 +148,7 @@ $app->post('/api/add-and-summarize', function ($request, $response) {
             $category = $categorizer->categorize($url, $manualContent);
 
             // Salva il link
-            $link = new Link($url, $content['title'], $category);
+            $link = new Link($url, $content['title'], $category,null, false, 0, $globalUserID);
             $link->setSummary($summary);
             $link->setContent($content['content']);
             $link->save();
@@ -169,8 +170,9 @@ $app->post('/api/add-and-summarize', function ($request, $response) {
 });
 
 $app->post('/api/summary/{id}', function ($request, $response, $args) {
+    global $globalUserID;
     $data = $request->getParsedBody();
-    $link = Link::getById($args['id']);
+    $link = Link::getById($args['id'], $globalUserID);
     
     if ($link) {
         $generator = new SummaryGenerator();
@@ -195,8 +197,9 @@ $app->get('/api/summary/{id}', function ($request, $response, $args) {
 });
 
 $app->delete('/api/links/{id}', function ($request, $response, $args) {
+    global $globalUserID;
     $id = $args['id'];
-    $link = Link::getById($id);
+    $link = Link::getById($id, $globalUserID);
     
     if ($link) {
         $link->delete();
@@ -266,8 +269,9 @@ $app->post('/api/links/{id}/read', function ($request, $response, $args) {
 });
 
 $app->post('/api/links/{id}/unread', function ($request, $response, $args) {
+    global $globalUserID;
     $id = $args['id'];
-    $link = Link::getById($id);
+    $link = Link::getById($id, $globalUserID);
     
     if ($link) {
         $link->setRead(false);
@@ -280,12 +284,13 @@ $app->post('/api/links/{id}/unread', function ($request, $response, $args) {
 
 // Aggiungi questa nuova route dopo le altre route esistenti
 $app->post('/api/chat', function ($request, $response) {
+    global $globalUserID;
     $data = $request->getParsedBody();
     $linkId = $data['linkId'];
     $message = $data['message'];
     $history = $data['history'];
 
-    $link = Link::getById($linkId);
+    $link = Link::getById($linkId, $globalUserID);
     if (!$link) {
         return $response->withStatus(404)->withJson(['error' => 'Link non trovato']);
     }
@@ -327,11 +332,12 @@ $app->post('/api/process-audio', function ($request, $response) {
 });
 
 $app->post('/api/links/{id}/ranking', function ($request, $response, $args) {
+    global $globalUserID;   
     $id = $args['id'];
     $data = $request->getParsedBody();
     $newRanking = $data['ranking'];
 
-    $link = Link::getById($id);
+    $link = Link::getById($id, $globalUserID);
     if ($link) {
         $link->setRanking($newRanking);
         $link->save();

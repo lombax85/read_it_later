@@ -145,5 +145,33 @@ class Database
         $this->connection->exec("
             INSERT OR IGNORE INTO users (username, password) VALUES ('admin', '$adminPassword')
         ");
+
+        // Aggiungi la colonna owner alla tabella links se non esiste già
+        $result = $this->connection->query("PRAGMA table_info(links)");
+        $columns = $result->fetchAll(PDO::FETCH_ASSOC);
+        $ownerExists = false;
+        foreach ($columns as $column) {
+            if ($column['name'] === 'owner') {
+                $ownerExists = true;
+                break;
+            }
+        }
+        if (!$ownerExists) {
+            $this->connection->exec("ALTER TABLE links ADD COLUMN owner INTEGER");
+        }
+
+        // Aggiungi la colonna owner alla tabella podcasts se non esiste già
+        $result = $this->connection->query("PRAGMA table_info(podcasts)");
+        $columns = $result->fetchAll(PDO::FETCH_ASSOC);
+        $ownerExists = false;
+        foreach ($columns as $column) {
+            if ($column['name'] === 'owner') {
+                $ownerExists = true;
+                break;
+            }
+        }
+        if (!$ownerExists) {
+            $this->connection->exec("ALTER TABLE podcasts ADD COLUMN owner INTEGER");
+        }
     }
 }
