@@ -130,5 +130,20 @@ class Database
         if (!$rankingExists) {
             $this->connection->exec("ALTER TABLE links ADD COLUMN ranking INTEGER DEFAULT 0");
         }
+
+        // Migrazione per la tabella users
+        $this->connection->exec("
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE,
+                password TEXT NOT NULL
+            )
+        ");
+
+        // Inserisci un utente admin di default
+        $adminPassword = password_hash('12345678', PASSWORD_BCRYPT);
+        $this->connection->exec("
+            INSERT OR IGNORE INTO users (username, password) VALUES ('admin', '$adminPassword')
+        ");
     }
 }

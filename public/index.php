@@ -27,14 +27,49 @@ use App\Models\Podcast;
 use App\Services\ChatService;
 use App\Services\TranscriptionService;
 use App\Services\TextToSpeechService;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use App\Models\User;
+use App\Database;
 
 // Inizializzazione dell'applicazione
 $app = new App();
 
+// login route
+$app->get('/login', function ($request, $response) {
+    return $response->write(file_get_contents(__DIR__ . '/login.html'));
+});
+
+// post login route
+$app->post('/login', function ($request, $response) {
+    $data = $request->getParsedBody();
+    $username = $data['username'];
+    $password = $data['password'];
+
+    $db = Database::getInstance()->getConnection(); // Get the PDO instance from the Database class
+    $userModel = new User($db);
+    $user = $userModel->findByUsername($username);
+
+    error_log('Verifica password: ' . password_verify($password, $user['password']));
+    if ($user && password_verify($password, $user['password'])) {
+        $token = generateJWT($user['id']);
+        return $response->withJson(['token' => $token]);
+    } else {
+        return $response->withStatus(401)->withJson(['error' => 'Invalid credentials']);
+    }
+});
+
 // auth middleware
 $app->add(function ($request, $response, $next) {
-	$response = $next($request, $response);
-	return $response;
+    $token = $request->getHeaderLine('Authorization');
+    if ($token) {
+        error_log('JWT Token: ' . $token);
+    } else {
+        error_log('No JWT Token found');
+    }
+
+    $response = $next($request, $response);
+    return $response;
 });
 
 
@@ -313,4 +348,20 @@ function cleanupTempFiles() {
 
 // Esecuzione dell'applicazione
 $app->run();
+
+// Add this function to generate JWT
+function generateJWT($userId)
+{
+    $key = $_ENV['JWT_SECRET'];
+    $payload = [
+        'iss' => 'your-issuer', // Issuer
+        'aud' => 'your-audience', // Audience
+        'iat' => time(), // Issued at
+        'nbf' => time(), // Not before
+        'exp' => time() + 3600, // Expiration time (1 hour)
+        'sub' => $userId // Subject (user ID)
+    ];
+
+    return JWT::encode($payload, $key, 'HS256');
+}
 

@@ -49,8 +49,22 @@ let audioChunks = [];
 let voiceConversationHistory = [];
 let readTimeout = [];
 
+function fetchWithAuth(url, options = {}) {
+    const token = localStorage.getItem('RIN_JWT_TOKEN');
+    const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+        'Authorization': `Bearer ${token}`
+    };
+
+    return fetch(url, {
+        ...options,
+        headers
+    });
+}
+
 function fetchLinks() {
-    fetch('./api/links')
+    fetchWithAuth('./api/links')
         .then(response => response.json())
         .then(links => {
             console.log('Links received from backend:', links);
@@ -141,7 +155,7 @@ function createStarRating(linkId, currentRanking) {
 }
 
 function updateRanking(linkId, newRanking) {
-    fetch(`./api/links/${linkId}/ranking`, {
+    fetchWithAuth(`./api/links/${linkId}/ranking`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -187,18 +201,18 @@ function updateGeneratePodcastButton() {
 }
 
 function generatePodcast(length, language) {
-    // Mostra l'icona di attesa
+    const token = localStorage.getItem('RIN_JWT_TOKEN');
     const loadingIcon = document.getElementById('loadingIcon');
     loadingIcon.style.display = 'block';
 
-    // Chiudi la modale
     document.getElementById('generatePodcastModal').style.display = 'none';
     document.getElementById('generatePodcastForm').reset();
 
-    fetch('./api/generate-podcast', {
+    fetchWithAuth('./api/generate-podcast', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ 
             links: selectedLinks,
@@ -208,20 +222,14 @@ function generatePodcast(length, language) {
     })
     .then(response => response.json())
     .then(data => {
-        // Simula un ritardo per dare l'illusione di una generazione in background
         setTimeout(() => {
-            // Nascondi l'icona di attesa
             loadingIcon.style.display = 'none';
-
-            // Aggiorna la lista dei podcast
             fetchPodcasts();
-
             alert('Podcast generato con successo!');
-        }, 5000); // Ritardo di 5 secondi, puoi regolarlo come preferisci
+        }, 5000);
     })
     .catch(error => {
         console.error('Errore nella generazione del podcast:', error);
-        // Nascondi l'icona di attesa anche in caso di errore
         loadingIcon.style.display = 'none';
         alert('Si è verificato un errore durante la generazione del podcast. Riprova più tardi.');
     });
@@ -258,7 +266,7 @@ function changePodcast() {
 
 function generateOrShowSummary(id, url, isRead) {
     if (url) {
-        fetch(`./api/summary/${id}`)
+        fetchWithAuth(`./api/summary/${id}`)
         .then(response => response.json())
         .then(data => {
             if (data.summary) {
@@ -282,7 +290,7 @@ function generateOrShowSummary(id, url, isRead) {
 }
 
 function markLinkAsRead(id) {
-    fetch(`./api/links/${id}/read`, {
+    fetchWithAuth(`./api/links/${id}/read`, {
         method: 'POST',
     })
     .then(response => response.json())
@@ -336,7 +344,7 @@ function toggleAccordion(id) {
 }
 
 function generateAndSaveSummary(id, url) {
-    fetch(`./api/summary/${id}`, {
+    fetchWithAuth(`./api/summary/${id}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -425,7 +433,7 @@ function addAndSummarizeLink(url, summaryLength, language, manualContent) {
     loadingIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Aggiunta in corso...';
     document.body.appendChild(loadingIcon);
 
-    fetch('./api/add-and-summarize', {
+    fetchWithAuth('./api/add-and-summarize', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -466,7 +474,7 @@ function addAndSummarizeLink(url, summaryLength, language, manualContent) {
 
 function deleteLink(id) {
     if (confirm('Sei sicuro di voler eliminare questo link?')) {
-        fetch(`./api/links/${id}`, {
+        fetchWithAuth(`./api/links/${id}`, {
             method: 'DELETE',
         })
         .then(response => {
@@ -481,7 +489,7 @@ function deleteLink(id) {
 }
 
 function fetchPodcasts() {
-    fetch('./api/podcasts')
+    fetchWithAuth('./api/podcasts')
         .then(response => response.json())
         .then(podcasts => {
             updatePodcastList(podcasts);
@@ -526,7 +534,7 @@ function deletePodcast() {
     }
 
     if (confirm('Sei sicuro di voler eliminare questo podcast?')) {
-        fetch(`./api${selectedPodcast}`, {
+        fetchWithAuth(`./api${selectedPodcast}`, {
             method: 'DELETE'
         })
         .then(response => {
@@ -586,7 +594,7 @@ function handleResize() {
 window.addEventListener('resize', handleResize);
 
 function markLinkAsUnread(id) {
-    fetch(`./api/links/${id}/unread`, {
+    fetchWithAuth(`./api/links/${id}/unread`, {
         method: 'POST',
     })
     .then(response => response.json())
@@ -663,7 +671,7 @@ function addMessageToChat(sender, message) {
 
 // Funzione per inviare un messaggio al server
 function sendChatMessage(message) {
-    fetch('./api/chat', {
+    fetchWithAuth('./api/chat', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -773,7 +781,7 @@ function initializePushToTalk() {
             alert('La richiesta sta impiegando più tempo del previsto. Riprova più tardi.');
         }, 30000);
 
-        fetch('/api/process-audio', {
+        fetchWithAuth('/api/process-audio', {
             method: 'POST',
             body: formData
         })
@@ -781,7 +789,7 @@ function initializePushToTalk() {
         .then(data => {
             clearTimeout(timeoutId);
             if (data.audioUrl) {
-                fetch(data.audioUrl, { method: 'HEAD' })
+                fetchWithAuth(data.audioUrl, { method: 'HEAD' })
                     .then(response => {
                         if (response.ok) {
                             console.log('File audio trovato, avvio riproduzione');
@@ -952,5 +960,34 @@ function initializeChatButton() {
         chatPlayButton.innerHTML = '<i class="fas fa-play"></i>';
         chatPlayButton.disabled = false;  // Assicurati che il pulsante rimanga abilitato dopo la fine della riproduzione
     });
+}
+
+function login(username, password) {
+    fetchWithAuth('./api/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Salva l'ID utente nella sessione
+            sessionStorage.setItem('user_id', data.user_id);
+            fetchLinks();
+            fetchPodcasts();
+        } else {
+            alert('Credenziali non valide');
+        }
+    })
+    .catch(error => console.error('Errore nel login:', error));
+}
+
+function logout() {
+    sessionStorage.removeItem('user_id');
+    alert('Logout effettuato');
+    // Reindirizza alla pagina di login
+    window.location.href = '/login.html';
 }
 
