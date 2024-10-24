@@ -212,12 +212,13 @@ $app->delete('/api/links/{id}', function ($request, $response, $args) {
 
 // Modifica la route per la generazione del podcast
 $app->post('/api/generate-podcast', function ($request, $response) {
+    global $globalUserID;
     $data = $request->getParsedBody();
     $linkIds = array_column($data['links'], 'id');
     $length = $data['length'] ?? 'medio';
     $language = $data['language'] ?? 'italiano';
 
-    $podcastGenerator = new PodcastGenerator();
+    $podcastGenerator = new PodcastGenerator($globalUserID);
     $result = $podcastGenerator->generate($linkIds, $length, $language);
 
     return $response->withJson([
@@ -228,7 +229,8 @@ $app->post('/api/generate-podcast', function ($request, $response) {
 
 // Modifica la route per ottenere la lista dei podcast
 $app->get('/api/podcasts', function ($request, $response) {
-    $podcasts = Podcast::getAll();
+    global $globalUserID;
+    $podcasts = Podcast::getAll($globalUserID);
     $podcastInfo = array_map(function ($podcast) {
         return [
             'url' => $podcast['filename'],
@@ -242,13 +244,14 @@ $app->get('/api/podcasts', function ($request, $response) {
 
 // Aggiungi questa nuova route dopo le altre route esistenti
 $app->delete('/api/podcasts/{filename}', function ($request, $response, $args) {
+    global $globalUserID;
     $filename = $args['filename'];
     $podcastPath = __DIR__ . '/podcasts/' . $filename;
 
     error_log("Podcast path: " . $podcastPath);
 
     if (file_exists($podcastPath)) {
-        Podcast::delete('/podcasts/' .$filename);
+        Podcast::delete('/podcasts/' .$filename, $globalUserID);
         unlink($podcastPath);
         return $response->withStatus(204);
     } else {
@@ -297,7 +300,7 @@ $app->post('/api/chat', function ($request, $response) {
         return $response->withStatus(404)->withJson(['error' => 'Link non trovato']);
     }
 
-    $chatService = new ChatService();
+    $chatService = new ChatService($globalUserID);
     $reply = $chatService->generateReply($link->getContent(), $message, $history);
 
     return $response->withJson(['reply' => $reply]);
@@ -305,6 +308,7 @@ $app->post('/api/chat', function ($request, $response) {
 
 // Aggiungi questo nuovo endpoint dopo gli altri
 $app->post('/api/process-audio', function ($request, $response) {
+    global $globalUserID;
     $uploadedFiles = $request->getUploadedFiles();
     $audioFile = $uploadedFiles['audio'];
     $podcastId = $request->getParsedBody()['podcastId'] ?? null;
@@ -315,7 +319,7 @@ $app->post('/api/process-audio', function ($request, $response) {
         $transcriptionService = new TranscriptionService();
         $userTranscription = $transcriptionService->transcribe($filename);
 
-        $chatService = new ChatService();
+        $chatService = new ChatService($globalUserID);
         $aiResponse = $chatService->generatePodcastResponse($userTranscription, $podcastId, $conversationHistory);
 
         $ttsService = new TextToSpeechService();

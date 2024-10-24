@@ -11,32 +11,34 @@ class Podcast {
     private $title;
     private $createdAt;
     private $linkIds;
+    private $owner;
 
-    public function __construct($filename = null, $title = null, $linkIds = []) {
+    public function __construct($filename = null, $title = null, $linkIds = [], $owner = null) {
         $this->filename = $filename;
         $this->title = $title;
         $this->createdAt = date('Y-m-d H:i:s');
         $this->linkIds = $linkIds;
+        $this->owner = $owner;
     }
 
     public function save() {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("INSERT INTO podcasts (filename, title, created_at, link_ids) VALUES (?, ?, ?, ?)");
+        $stmt = $db->prepare("INSERT INTO podcasts (filename, title, created_at, link_ids, owner) VALUES (?, ?, ?, ?, ?)");
         $linkIdsString = implode(',', $this->linkIds);
-        $stmt->execute([$this->filename, $this->title, $this->createdAt, $linkIdsString]);
+        $stmt->execute([$this->filename, $this->title, $this->createdAt, $linkIdsString, $this->owner]);
         $this->id = $db->lastInsertId();
     }
 
-    public static function getAll() {
+    public static function getAll($owner) {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->query("SELECT * FROM podcasts ORDER BY created_at DESC");
+        $stmt = $db->query("SELECT * FROM podcasts WHERE owner = ? ORDER BY created_at DESC", $owner);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function delete($filename) {
+    public static function delete($filename, $owner) {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("DELETE FROM podcasts WHERE filename = ?");
-        $stmt->execute([$filename]);
+        $stmt = $db->prepare("DELETE FROM podcasts WHERE filename = ? AND owner = ?");
+        $stmt->execute([$filename, $owner]);
     }
 
     // Getter per linkIds
@@ -47,16 +49,16 @@ class Podcast {
     public function getScript() {
         // Assumiamo che lo script sia memorizzato in una colonna 'script' nel database
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT script FROM podcasts WHERE id = ?");
-        $stmt->execute([$this->id]);
+        $stmt = $db->prepare("SELECT script FROM podcasts WHERE id = ? AND owner = ?");
+        $stmt->execute([$this->id, $this->owner]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result['script'] ?? '';
     }
 
-    public static function getByFilename($id) {
+    public static function getByFilename($id, $owner) {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT * FROM podcasts WHERE filename = ?");
-        $stmt->execute([$id]);
+        $stmt = $db->prepare("SELECT * FROM podcasts WHERE filename = ? AND owner = ?");
+        $stmt->execute([$id, $owner]);
         $podcast = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($podcast) {

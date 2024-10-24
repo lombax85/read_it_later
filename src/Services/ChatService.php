@@ -8,13 +8,14 @@ use App\Models\Link;
 
 class ChatService {
     private $client;
-
-    public function __construct() {
+    private $owner;
+    public function __construct($owner) {
         $apiKey = $_ENV['OPENAI_API_KEY'] ?? null;
         if (!$apiKey) {
             throw new \Exception('OPENAI_API_KEY non è stata impostata');
         }
         $this->client = OpenAI::client($apiKey);
+        $this->owner = $owner;
     }
 
     public function generateReply($articleContent, $userMessage, $history) {
@@ -44,7 +45,7 @@ class ChatService {
     }
 
     public function generatePodcastResponse($transcription, $podcastId, $conversationHistory = []) {
-        $podcast = Podcast::getByFilename($podcastId);
+        $podcast = Podcast::getByFilename($podcastId, $this->owner);
         if (!$podcast) {
             throw new \Exception('Podcast non trovato');
         }
@@ -85,7 +86,7 @@ class ChatService {
     private function getArticlesContent($linkIds) {
         $content = "";
         foreach ($linkIds as $id) {
-            $link = Link::getById($id);
+            $link = Link::getById($id, $this->owner);
             if ($link) {
                 $content .= "Articolo: " . $link->getTitle() . "\n";
                 $content .= $link->getContent() . "\n\n";
@@ -97,7 +98,7 @@ class ChatService {
     private function getPodcastScript($linkIds) {
         $script = "";
         foreach ($linkIds as $id) {
-            $link = Link::getById($id);
+            $link = Link::getById($id, $this->owner);
             if ($link) {
                 $script .= $link->getContent() . "\n\n";
             }

@@ -9,14 +9,16 @@ use App\Models\Podcast;
 class PodcastGenerator {
     private $openaiClient;
     private $contentExtractor;
+    private $owner;
 
-    public function __construct() {
+    public function __construct($owner) {
         $apiKey = $_ENV['OPENAI_API_KEY'] ?? null;
         if (!$apiKey) {
             throw new \Exception('OPENAI_API_KEY non è stata impostata');
         }
         $this->openaiClient = OpenAI::client($apiKey);
         $this->contentExtractor = new ContentExtractor();
+        $this->owner = $owner;
     }
 
     public function generate($linkIds, $length = 'medio', $language = 'italiano') {
@@ -34,7 +36,7 @@ class PodcastGenerator {
     private function getContents($linkIds) {
         $contents = [];
         foreach ($linkIds as $id) {
-            $link = Link::getById($id);
+            $link = Link::getById($id, $this->owner);
             if ($link) {
                 $content = $link->getContent();
                 if ($content) {
