@@ -32,8 +32,11 @@ use Firebase\JWT\Key;
 use App\Models\User;
 use App\Database;
 
+global $globalUserID;
+
 // Inizializzazione dell'applicazione
 $app = new App();
+
 
 // login route
 $app->get('/login', function ($request, $response) {
@@ -61,11 +64,26 @@ $app->post('/login', function ($request, $response) {
 
 // auth middleware
 $app->add(function ($request, $response, $next) {
+
+    $allowedPaths = ['/login', '/'];
+    if (in_array($request->getUri()->getPath(), $allowedPaths)) {
+        error_log('Allowed path: ' . $request->getUri()->getPath());
+        $response = $next($request, $response);
+        return $response;
+    }
+    
     $token = $request->getHeaderLine('Authorization');
-    if ($token) {
-        error_log('JWT Token: ' . $token);
-    } else {
-        error_log('No JWT Token found');
+    // remove Bearer from the token
+    $token = str_replace('Bearer ', '', $token);
+    // check if token is valid and not expired 
+    try {
+        $decoded = JWT::decode($token, new Key($_ENV['JWT_SECRET'], 'HS256'));
+        global $globalUserID;
+        $globalUserID = $decoded->sub;
+    } catch (Exception $e) {
+        error_log('JWT Token is invalid: ' . $e->getMessage() . " in token " . $token);
+        header('Location: /login');
+        exit;
     }
 
     $response = $next($request, $response);
@@ -80,6 +98,8 @@ $app->get('/', function ($request, $response) {
 
 // API routes
 $app->get('/api/links', function ($request, $response) {
+    global $globalUserID;
+    error_log('Global user: ' . print_r($globalUserID, true));
     $links = Link::getAll();
     return $response->withJson($links);
 });
@@ -354,12 +374,9 @@ function generateJWT($userId)
 {
     $key = $_ENV['JWT_SECRET'];
     $payload = [
-        'iss' => 'your-issuer', // Issuer
-        'aud' => 'your-audience', // Audience
         'iat' => time(), // Issued at
-        'nbf' => time(), // Not before
-        'exp' => time() + 3600, // Expiration time (1 hour)
-        'sub' => $userId // Subject (user ID)
+        'exp' => time() + 86400, 
+        'sub' => $userId 
     ];
 
     return JWT::encode($payload, $key, 'HS256');

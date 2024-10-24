@@ -78,9 +78,7 @@ class Link implements JsonSerializable {
             $linkObject->ranking = $link['ranking'];
             $linkObjects[] = $linkObject;
         }
-        
-        error_log('Link objects: ' . print_r($linkObjects, true));
-        
+                
         return $linkObjects;
     }
 
