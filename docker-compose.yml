@@ -12,3 +12,9 @@ services:
       - .:/var/www/html
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - XDEBUG_ENABLED=1 # Imposta a 1 per abilitare XDebug
+    command: >
+      sh -c "if [ \"$XDEBUG_ENABLED\" = \"1\" ]; then
+               mv /usr/local/etc/php/conf.d/xdebug.ini.disabled /usr/local/etc/php/conf.d/xdebug.ini;
+             fi &&
+             apache2-foreground"
