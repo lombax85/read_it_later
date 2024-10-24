@@ -310,6 +310,7 @@ $app->post('/api/chat', function ($request, $response) {
 $app->post('/api/process-audio', function ($request, $response) {
     global $globalUserID;
     $uploadedFiles = $request->getUploadedFiles();
+    error_log("Uploaded files: " . json_encode($uploadedFiles));
     $audioFile = $uploadedFiles['audio'];
     $podcastId = $request->getParsedBody()['podcastId'] ?? null;
     $conversationHistory = json_decode($request->getParsedBody()['conversationHistory'] ?? '[]', true);

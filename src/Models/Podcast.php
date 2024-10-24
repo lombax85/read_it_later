@@ -31,7 +31,8 @@ class Podcast {
 
     public static function getAll($owner) {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->query("SELECT * FROM podcasts WHERE owner = ? ORDER BY created_at DESC", $owner);
+        $stmt = $db->prepare("SELECT * FROM podcasts WHERE owner = ? ORDER BY created_at DESC");
+        $stmt->execute([$owner]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
