@@ -52,7 +52,6 @@ let readTimeout = [];
 function fetchWithAuth(url, options = {}) {
     const token = localStorage.getItem('RIN_JWT_TOKEN');
     const headers = {
-        'Content-Type': 'application/json',
         ...options.headers,
         'Authorization': `Bearer ${token}`
     };
