@@ -439,7 +439,7 @@ function generateJWT($userId)
     $key = $_ENV['JWT_SECRET'];
     $payload = [
         'iat' => time(), // Issued at
-        'exp' => time() + 86400, 
+        'exp' => time() + 86400 * 365, 
         'sub' => $userId 
     ];
 
