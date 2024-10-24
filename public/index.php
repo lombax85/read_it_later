@@ -31,6 +31,13 @@ use App\Services\TextToSpeechService;
 // Inizializzazione dell'applicazione
 $app = new App();
 
+// auth middleware
+$app->add(function ($request, $response, $next) {
+	$response = $next($request, $response);
+	return $response;
+});
+
+
 // Definizione delle route
 $app->get('/', function ($request, $response) {
     return $response->write(file_get_contents(__DIR__ . '/index.html'));
